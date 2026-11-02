@@ -1,0 +1,101 @@
+﻿
+BÁO CÁO TIẾN ĐỘ TUẦN 08
+Đề tài: Hệ thống Quản lý Phòng khám có Tích hợp AI – Nhóm 03
+Thời gian: 14/09/2026 – 20/09/2026  |  Chủ đề tuần: Kiểm thử và hoàn thiện hệ thống
+1. Mục tiêu của tuần
+Kiểm thử toàn diện hệ thống theo kịch bản kiểm thử đã xây dựng, khắc phục lỗi phát hiện được, tối ưu hiệu năng và chuẩn bị môi trường triển khai thử nghiệm.
+2. Lịch làm việc chi tiết theo ngày
+Ngày
+Công việc cụ thể
+Người phụ trách
+
+Thứ 2 (14/09)
+Họp đầu tuần, xây dựng kế hoạch kiểm thử tổng thể và danh sách tính năng cần kiểm tra
+Cả nhóm
+
+Thứ 3 (15/09)
+Viết test case cho các Use Case nghiệp vụ cốt lõi (UC001–UC009)
+Minh, Tuân
+
+Thứ 3 (15/09)
+Khắc phục lỗi xử lý dữ liệu phát hiện trong quá trình viết test case
+Vũ
+
+Thứ 4 (16/09)
+Viết test case cho các Use Case còn lại (UC010–UC014) và các trường hợp ngoại lệ
+Minh, Tuân
+
+Thứ 5 (17/09)
+Thực thi toàn bộ test case, ghi nhận lỗi vào bảng theo dõi lỗi
+Cả nhóm
+
+Thứ 6 (18/09)
+Khắc phục các lỗi mức độ nghiêm trọng và trung bình đã ghi nhận
+Vũ
+
+Thứ 6 (18/09)
+Kiểm thử lại giao diện trên nhiều kích thước màn hình, khắc phục lỗi hiển thị
+Tuân
+
+Thứ 7 (19/09)
+Tối ưu tốc độ xử lý các truy vấn chậm, kiểm thử lại hiệu năng chatbot AI
+Vũ
+
+Thứ 7 (19/09)
+Chuẩn bị môi trường triển khai thử nghiệm (chọn dịch vụ cloud, cấu hình ban đầu)
+Tuân
+
+Chủ nhật (20/09)
+Họp tổng kết tuần 8, tổng hợp báo cáo kiểm thử, xác nhận hệ thống sẵn sàng cho tuần 9
+Cả nhóm
+
+3. Chi tiết công việc từng thành viên
+Bùi Đức Minh (Trưởng nhóm)
+- Chủ trì xây dựng kế hoạch kiểm thử: xác định mục đích, phạm vi, công cụ và môi trường kiểm thử (kiểm thử thủ công trên trình duyệt, dùng Postman kiểm thử API).
+- Cùng Tuân viết test case cho toàn bộ 14 Use Case, bao gồm cả kịch bản chính và các trường hợp ngoại lệ.
+- Tổng hợp kết quả kiểm thử thành báo cáo kiểm thử cuối tuần (số lượng test case, tỉ lệ đạt, các lỗi còn tồn đọng), chuẩn bị nội dung hỏi - đáp phục vụ báo cáo đề tài.
+Thân Tuấn Vũ & Dương Văn Tuân
+- Khắc phục lỗi xử lý dữ liệu, tối ưu tốc độ xử lý và độ ổn định của hệ thống dựa trên kết quả kiểm thử.
+- Tối ưu thời gian phản hồi của chatbot AI để đảm bảo đạt yêu cầu phi chức năng (dưới 5 giây) đã đề ra trong SRS.
+- Kiểm thử toàn bộ hệ thống theo kịch bản đã xây dựng, phối hợp khắc phục lỗi giao diện phát hiện trong quá trình test.
+- Tối ưu trải nghiệm sử dụng (UI/UX) và chuẩn bị môi trường triển khai thử nghiệm trên dịch vụ cloud miễn phí.
+4. Kết quả cụ thể đạt được
+- Bộ test case đầy đủ cho toàn bộ 14 Use Case, bao gồm cả luồng chính và luồng ngoại lệ.
+- Đã thực thi kiểm thử và khắc phục các lỗi mức độ nghiêm trọng, trung bình phát hiện được.
+- Thời gian phản hồi của hệ thống và chatbot AI đạt đúng yêu cầu phi chức năng trong SRS.
+- Môi trường triển khai thử nghiệm đã được chuẩn bị sẵn sàng.
+- Báo cáo kiểm thử tổng hợp đã hoàn thành, hệ thống sẵn sàng cho việc triển khai và tổng kết ở tuần 9.
+5. Số liệu tổng kết tuần
+Nội dung
+Số liệu
+
+Số Use Case đã viết test case
+14/14 UC
+
+Số test case đã xây dựng
+Khoảng 60 test case
+
+Tỉ lệ test case đạt (pass) sau khi sửa lỗi
+Trên 90%
+
+Số lỗi đã khắc phục trong tuần
+Khoảng 15 lỗi
+
+6. Khó khăn và hướng giải quyết
+Khó khăn
+Nguyên nhân
+Cách giải quyết
+
+Số lượng lỗi phát hiện được khi kiểm thử nhiều hơn dự kiến, đặc biệt ở các luồng ngoại lệ.
+Trong các tuần lập trình trước, nhóm ưu tiên hoàn thành luồng chính, chưa kiểm thử kỹ luồng ngoại lệ.
+Ưu tiên khắc phục các lỗi ảnh hưởng đến luồng chính trước, các lỗi nhỏ ở luồng phụ được ghi nhận và xử lý dần trong tuần.
+
+Thời gian phản hồi ban đầu của chatbot AI vượt quá 5 giây trong một số trường hợp.
+Truy vấn Vector DB và gọi LLM tuần tự khiến thời gian phản hồi bị cộng dồn.
+Tối ưu lại truy vấn Vector DB (giảm số lượng tài liệu truy xuất) và rút gọn prompt gửi tới LLM.
+
+7. Kế hoạch tuần tiếp theo
+- Hoàn thiện tài liệu báo cáo đề tài và chuẩn bị nội dung trình chiếu.
+- Cài đặt chính thức hệ thống lên môi trường vận hành thử nghiệm và kiểm tra lần cuối.
+- Tổng duyệt, thuyết trình và bàn giao sản phẩm.
+

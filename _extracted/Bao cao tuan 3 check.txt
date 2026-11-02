@@ -1,0 +1,109 @@
+﻿
+BÁO CÁO TIẾN ĐỘ TUẦN 03
+Đề tài: Hệ thống Quản lý Phòng khám có Tích hợp AI – Nhóm 03
+Thời gian: 10/08/2026 – 16/08/2026  |  Chủ đề tuần: Thiết kế tổng thể hệ thống
+Ghi chú kiểm tra (đối chiếu báo cáo mẫu):
+Đối chiếu với báo cáo mẫu (đầu Chương IV – Phân tích và thiết kế hệ thống, phần Use Case), nội dung tuần 3 đã tương đối đầy đủ — chỉ bổ sung thêm 1 việc còn thiếu là "xây dựng sơ đồ Use Case tổng quát" vào lịch làm việc, chi tiết công việc và kết quả (đã cập nhật trực tiếp ở các mục 2–4 phía trên, không cần thêm mục mới). Đây là phần việc thực tế đã có trong tài liệu SRS nhưng trước đó chưa được ghi nhận vào báo cáo tuần 3.
+1. Mục tiêu của tuần
+Có được sơ đồ tổng thể mô tả cách hệ thống hoạt động, bản thiết kế chi tiết cho việc lưu trữ 4 nhóm dữ liệu chính, và bản thiết kế cấu trúc cho 6 màn hình chính — làm nền tảng để bắt đầu xây dựng hệ thống từ tuần 4.
+2. Lịch làm việc chi tiết theo ngày
+Ngày
+Công việc cụ thể
+Người phụ trách
+
+Thứ 2 (10/08)
+Họp đầu tuần, trình bày lại toàn bộ tài liệu yêu cầu đã hoàn thiện ở tuần 2 để cả nhóm thống nhất trước khi thiết kế
+Cả nhóm
+
+Thứ 3 (11/08)
+Thiết kế kiến trúc tổng thể: hệ thống gồm 3 phần (giao diện, xử lý nghiệp vụ, lưu trữ dữ liệu) và cách chúng trao đổi thông tin
+Vũ, Tuân
+
+Thứ 3 (11/08)
+Cập nhật tài liệu kế hoạch theo tiến độ thực tế của nhóm
+Minh
+
+Thứ 4 (12/08)
+Thiết kế chi tiết cách lưu trữ dữ liệu cho nhóm "Bệnh nhân" và "Lịch hẹn"
+Vũ, Tuân
+
+Thứ 5 (13/08)
+Thiết kế chi tiết cách lưu trữ dữ liệu cho nhóm "Đơn thuốc" và "Hóa đơn"
+Vũ, Tuân
+
+Thứ 5 (13/08)
+Bắt đầu tìm hiểu tổng thể luồng hoạt động của toàn hệ thống để nắm được bức tranh chung
+Minh
+
+Thứ 6 (14/08)
+Xây dựng sơ đồ Use Case tổng quát (4 tác nhân, danh sách 14 Use Case) làm cơ sở cho tài liệu đặc tả SRS
+Vũ, Tuân
+
+Thứ 6 (14/08)
+Thiết kế cấu trúc và luồng thao tác cho 6 màn hình chính
+Vũ, Tuân
+
+Thứ 7 (15/08)
+Rà soát chéo bản thiết kế dữ liệu và màn hình, kiểm tra tính nhất quán
+Cả nhóm
+
+Chủ nhật (16/08)
+Họp tổng kết tuần 3, hoàn thiện tài liệu thiết kế, chuẩn bị cho tuần 4 bắt đầu xây dựng chi tiết
+Cả nhóm
+
+3. Chi tiết công việc từng thành viên
+Bùi Đức Minh (Trưởng nhóm)
+- Chủ trì buổi họp đầu tuần trình bày lại toàn bộ nội dung tài liệu yêu cầu cho Vũ và Tuân, đảm bảo cả nhóm hiểu thống nhất trước khi bắt đầu thiết kế.
+- Cập nhật tài liệu kế hoạch thực hiện, đánh dấu các đầu việc đã hoàn thành ở tuần 1 và tuần 2, điều chỉnh nhẹ một số mốc thời gian cho phù hợp với tiến độ thực tế.
+- Dành thời gian tìm hiểu tổng thể để nắm được toàn bộ luồng hoạt động của hệ thống, chuẩn bị cho vai trò theo dõi tiến độ chung và thuyết trình báo cáo sau này.
+Thân Tuấn Vũ & Dương Văn Tuân
+- Thiết kế kiến trúc tổng thể của hệ thống, xác định 3 phần chính: giao diện người dùng, xử lý nghiệp vụ, lưu trữ dữ liệu, và cách chúng trao đổi thông tin với nhau.
+- Thiết kế chi tiết cách lưu trữ cho 4 nhóm dữ liệu chính: bệnh nhân, lịch hẹn, đơn thuốc, hóa đơn — chỉ rõ nhóm nào liên quan đến nhóm nào.
+- Xây dựng sơ đồ Use Case tổng quát: xác định 4 tác nhân (Bệnh nhân, Bác sĩ, Nhân viên, Admin) và liệt kê đầy đủ 14 Use Case, vẽ sơ đồ thể hiện tác nhân nào tương tác với Use Case nào — đây là bước chuẩn bị trực tiếp cho tài liệu Đặc tả yêu cầu SRS ở tuần 4.
+- Thiết kế cấu trúc và cách di chuyển qua lại cho 6 màn hình chính: đăng nhập, trang chủ bệnh nhân, đặt lịch khám, hồ sơ bệnh nhân, khám bệnh (bác sĩ), kê đơn thuốc.
+4. Kết quả cụ thể đạt được
+- Sơ đồ kiến trúc tổng thể của hệ thống (3 phần chính và cách liên kết).
+- Bản thiết kế chi tiết cho 4 nhóm dữ liệu chính, có ghi rõ mối liên hệ giữa các nhóm.
+- Sơ đồ Use Case tổng quát với 4 tác nhân và 14 Use Case.
+- Bản thiết kế cấu trúc và luồng di chuyển cho 6 màn hình chính.
+- Tài liệu kế hoạch được cập nhật đúng tiến độ thực tế.
+5. Số liệu tổng kết tuần
+Nội dung
+Số liệu
+
+Số buổi họp nhóm
+3 buổi
+
+Số phần chính trong kiến trúc hệ thống
+3 phần
+
+Số nhóm dữ liệu đã thiết kế chi tiết
+4 nhóm
+
+Số tác nhân trong sơ đồ Use Case
+4 tác nhân
+
+Số Use Case đã xác định
+14 UC
+
+Số màn hình đã thiết kế cấu trúc
+6 màn hình
+
+6. Khó khăn và hướng giải quyết
+Khó khăn
+Nguyên nhân
+Cách giải quyết
+
+Thiết kế sao cho dữ liệu giữa các nhóm liên kết chặt chẽ mà không bị trùng lặp hoặc thiếu sót là phần khó nhất trong tuần.
+Đây là lần đầu nhóm thực hiện thiết kế dữ liệu cho một hệ thống có nhiều phần liên quan chặt chẽ với nhau.
+Vẽ sơ đồ trực quan thể hiện mối liên hệ giữa các nhóm dữ liệu, cùng kiểm tra chéo từng trường hợp cụ thể.
+
+Bản thiết kế màn hình ở tuần 2 chưa tính đến việc chuyển màn hình, phải bổ sung thêm nhiều đường liên kết.
+Ở tuần 2 nhóm mới tập trung vào việc từng màn hình có gì mà chưa nghĩ đến cách chúng liên kết với nhau.
+Vẽ lại toàn bộ dưới dạng sơ đồ luồng trước khi bắt đầu lập trình.
+
+7. Kế hoạch tuần tiếp theo
+- Hoàn thiện tài liệu đặc tả SRS chi tiết cho từng Use Case (kịch bản, điều kiện, luồng sự kiện).
+- Thiết kế biểu đồ lớp, biểu đồ trạng thái và biểu đồ tuần tự cho các nghiệp vụ chính.
+- Thiết kế cách đăng nhập, xác thực và phân quyền sử dụng cho từng loại người dùng.
+

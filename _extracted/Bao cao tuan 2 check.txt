@@ -1,0 +1,120 @@
+﻿
+BÁO CÁO TIẾN ĐỘ TUẦN 02
+Đề tài: Hệ thống Quản lý Phòng khám có Tích hợp AI – Nhóm 03
+Thời gian: 03/08/2026 – 09/08/2026  |  Chủ đề tuần: Phân tích yêu cầu chi tiết
+Ghi chú kiểm tra (đối chiếu báo cáo mẫu):
+Đối chiếu với báo cáo mẫu (Chương III – Khảo sát hệ thống), tuần 2 còn thiếu mục "Đánh giá hệ thống hiện trạng" (ưu điểm/nhược điểm của cách quản lý hiện tại trước khi đề xuất hệ thống mới) — đây là bước bắt buộc trước khi đưa ra yêu cầu chức năng. Đã bổ sung mục 8 bên dưới.
+1. Mục tiêu của tuần
+Hoàn thiện tài liệu yêu cầu với đầy đủ danh sách 13 chức năng, phân tích chi tiết 5 quy trình nghiệp vụ chính, xác định rõ những thông tin dữ liệu cần lưu trữ, và có bản phác thảo sơ bộ cho 4 màn hình chính.
+2. Lịch làm việc chi tiết theo ngày
+Ngày
+Công việc cụ thể
+Người phụ trách
+
+Thứ 2 (03/08)
+Họp đầu tuần, rà soát việc còn tồn đọng của tuần 1, phân công công việc tuần 2
+Cả nhóm
+
+Thứ 3 (04/08)
+Bổ sung mục "Các định nghĩa, thuật ngữ" và "Tài liệu tham khảo" vào tài liệu đặc tả yêu cầu
+Minh
+
+Thứ 3 (04/08)
+Phân tích chi tiết quy trình "Đặt lịch khám": liệt kê từng bước và thông tin cần nhập
+Vũ, Tuân
+
+Thứ 4 (05/08)
+Phân tích chi tiết quy trình "Tiếp nhận bệnh nhân" và "Khám bệnh"
+Vũ, Tuân
+
+Thứ 5 (06/08)
+Phân tích chi tiết quy trình "Kê đơn thuốc" và "Thanh toán hóa đơn"
+Vũ, Tuân
+
+Thứ 5 (06/08)
+Tổng hợp danh sách đầy đủ 13 chức năng và các yêu cầu về chất lượng (tốc độ, bảo mật, dễ dùng)
+Minh
+
+Thứ 6 (07/08)
+Xác định 5 nhóm thông tin cần lưu trữ: bệnh nhân, lịch hẹn, đơn thuốc, hóa đơn, lịch làm việc bác sĩ
+Vũ, Tuân
+
+Thứ 7 (08/08)
+Phác thảo tay 4 màn hình chính: đăng nhập, đặt lịch khám, hồ sơ bệnh nhân, kê đơn thuốc
+Vũ, Tuân
+
+Thứ 7 (08/08)
+Tổng hợp 15 câu hỏi - câu trả lời quan trọng phát sinh trong tuần để chuẩn bị báo cáo
+Minh
+
+Chủ nhật (09/08)
+Họp tổng kết tuần 2, rà soát toàn bộ tài liệu trước khi bước sang tuần 3
+Cả nhóm
+
+3. Chi tiết công việc từng thành viên
+Bùi Đức Minh (Trưởng nhóm)
+- Bổ sung mục "Các định nghĩa, thuật ngữ" và mục "Tài liệu tham khảo" (liệt kê 5 nguồn tài liệu nhóm đã sử dụng) vào tài liệu đặc tả yêu cầu.
+- Tổng hợp danh sách đầy đủ 13 chức năng chính của hệ thống dựa trên kết quả phân tích quy trình của Vũ và Tuân, viết mô tả ngắn gọn cho từng chức năng.
+- Liệt kê các yêu cầu về chất lượng của hệ thống bằng ngôn ngữ đơn giản: hệ thống phải phản hồi nhanh, phải bảo vệ thông tin bệnh nhân, giao diện phải dễ dùng cho nhân viên không rành máy tính.
+- Ghi chép và tổng hợp lại khoảng 15 câu hỏi - câu trả lời quan trọng đã trao đổi trong nhóm suốt tuần, chuẩn bị cho buổi báo cáo với giảng viên (tài liệu "Thu thập, làm rõ yêu cầu").
+Thân Tuấn Vũ & Dương Văn Tuân
+- Phân tích chi tiết từng bước của 5 quy trình nghiệp vụ chính: đặt lịch khám, tiếp nhận bệnh nhân, khám bệnh, kê đơn thuốc, thanh toán hóa đơn.
+- Xác định 5 nhóm thông tin chính cần lưu trữ trong hệ thống: bệnh nhân, lịch hẹn, đơn thuốc, hóa đơn, lịch làm việc bác sĩ.
+- Vẽ phác thảo tay cho 4 màn hình chính: đăng nhập, đặt lịch khám, hồ sơ bệnh nhân, kê đơn thuốc — mỗi màn hình có ghi chú các thành phần chính.
+4. Kết quả cụ thể đạt được
+- Tài liệu đặc tả yêu cầu đã hoàn chỉnh toàn bộ phần "Giới thiệu chung" (đủ 4 mục).
+- Danh sách đầy đủ 13 chức năng chính kèm mô tả ngắn gọn cho từng chức năng.
+- 5 quy trình nghiệp vụ chính đã được phân tích chi tiết từng bước.
+- 5 nhóm thông tin dữ liệu chính đã được xác định rõ.
+- 4 bản phác thảo màn hình chính.
+- 15 câu hỏi - câu trả lời quan trọng đã được tổng hợp.
+5. Số liệu tổng kết tuần
+Nội dung
+Số liệu
+
+Số buổi họp nhóm
+2 buổi
+
+Số quy trình nghiệp vụ đã phân tích
+5 quy trình
+
+Số chức năng đã liệt kê đầy đủ
+13 chức năng
+
+Số nhóm dữ liệu đã xác định
+5 nhóm
+
+Số màn hình đã phác thảo
+4 màn hình
+
+Số câu hỏi - trả lời đã tổng hợp
+15 câu
+
+6. Khó khăn và hướng giải quyết
+Khó khăn
+Nguyên nhân
+Cách giải quyết
+
+Quy trình "Kê đơn thuốc" và "Thanh toán" có nhiều trường hợp đặc biệt khiến việc liệt kê đầy đủ gặp khó khăn.
+Đây là 2 quy trình phức tạp nhất, có nhiều tình huống phát sinh trong thực tế.
+Họp riêng 2 buổi tối để cùng rà soát kỹ, liệt kê thêm các trường hợp ngoại lệ.
+
+Bản phác thảo màn hình ban đầu còn khá sơ sài, thiếu một số thông tin cần hiển thị.
+Nhóm chưa quen với việc thiết kế giao diện nên bỏ sót một số chi tiết nhỏ.
+Xem lại các phần mềm quản lý phòng khám đã tham khảo ở tuần 1 để bổ sung thêm chi tiết.
+
+7. Kế hoạch tuần tiếp theo
+- Thiết kế sơ đồ tổng thể mô tả các phần của hệ thống và cách chúng liên kết với nhau.
+- Thiết kế chi tiết cách tổ chức 5 nhóm dữ liệu đã xác định.
+- Hoàn thiện bản thiết kế cho ít nhất 6 màn hình chính.
+8. Đánh giá hệ thống hiện trạng
+Ưu điểm của cách quản lý hiện tại (sổ sách/phần mềm rời rạc):
+- Đơn giản, không cần đầu tư hạ tầng công nghệ phức tạp.
+- Nhân viên đã quen thao tác thủ công, không mất thời gian đào tạo lại.
+Nhược điểm:
+- Dễ sai sót, thất lạc hồ sơ giấy; khó tra cứu lịch sử khám bệnh cũ.
+- Không hỗ trợ đặt lịch trực tuyến, bệnh nhân phải gọi điện hoặc đến trực tiếp.
+- Không có công cụ cảnh báo tương tác thuốc, phụ thuộc hoàn toàn vào trí nhớ bác sĩ.
+- Khó tổng hợp báo cáo, thống kê doanh thu theo thời gian thực.
+Kết luận: hệ thống mới cần số hóa toàn bộ quy trình khám chữa bệnh, đồng thời bổ sung AI hỗ trợ nhằm khắc phục các nhược điểm trên — đây chính là cơ sở cho danh sách 13 chức năng đã chốt ở tuần 1 và các yêu cầu chức năng/phi chức năng trong tài liệu "Thu thập, làm rõ yêu cầu".
+

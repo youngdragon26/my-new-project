@@ -1,0 +1,106 @@
+﻿
+BÁO CÁO TIẾN ĐỘ TUẦN 06
+Đề tài: Hệ thống Quản lý Phòng khám có Tích hợp AI – Nhóm 03
+Thời gian: 31/08/2026 – 06/09/2026  |  Chủ đề tuần: Xây dựng chức năng cốt lõi (đợt 2)
+1. Mục tiêu của tuần
+Hoàn thành nhóm chức năng thứ hai: đặt lịch khám, quản lý lịch hẹn/hàng đợi, quản lý lịch làm việc bác sĩ, khám bệnh, kê đơn thuốc, dịch vụ khám và hóa đơn — hệ thống có thể chạy được toàn bộ luồng nghiệp vụ chính (chưa có AI).
+2. Lịch làm việc chi tiết theo ngày
+Ngày
+Công việc cụ thể
+Người phụ trách
+
+Thứ 2 (31/08)
+Họp đầu tuần, rà soát lỗi tồn đọng của tuần 5, phân công công việc tuần 6
+Cả nhóm
+
+Thứ 3 (01/09)
+Lập trình chức năng quản lý lịch làm việc bác sĩ/nhân viên (UC009) và quản lý dịch vụ khám & bảng giá (UC008)
+Vũ
+
+Thứ 3 (01/09)
+Xây dựng giao diện đặt lịch khám (chọn chuyên khoa, bác sĩ, khung giờ)
+Tuân
+
+Thứ 4 (02/09)
+Lập trình chức năng đặt lịch khám (UC003), kiểm tra khung giờ theo thời gian thực
+Vũ
+
+Thứ 5 (03/09)
+Lập trình chức năng quản lý lịch hẹn & hàng đợi khám: check-in, chuyển trạng thái (UC004)
+Vũ
+
+Thứ 5 (03/09)
+Xây dựng giao diện quản lý lịch hẹn/hàng đợi cho lễ tân và bác sĩ
+Tuân
+
+Thứ 6 (04/09)
+Lập trình chức năng khám bệnh & lập hồ sơ khám (UC005) và kê đơn thuốc (UC006, chưa gồm AI cảnh báo)
+Vũ
+
+Thứ 6 (04/09)
+Xây dựng giao diện màn hình khám bệnh (bác sĩ) và giao diện kê đơn thuốc
+Tuân
+
+Thứ 7 (05/09)
+Lập trình chức năng thanh toán & lập hóa đơn (UC007) và quản lý danh mục thuốc (UC014)
+Vũ
+
+Thứ 7 (05/09)
+Xây dựng giao diện hóa đơn/thanh toán và giao diện quản lý danh mục thuốc
+Tuân
+
+Chủ nhật (06/09)
+Họp tổng kết tuần 6, demo toàn bộ luồng nghiệp vụ từ đặt lịch đến thanh toán
+Cả nhóm
+
+3. Chi tiết công việc từng thành viên
+Bùi Đức Minh (Trưởng nhóm)
+- Theo dõi tiến độ, đối chiếu từng chức năng đã lập trình với đặc tả Use Case tương ứng trong SRS (UC003–UC009, UC014).
+- Trực tiếp thử nghiệm luồng nghiệp vụ với vai trò bệnh nhân/lễ tân/bác sĩ để phát hiện sớm các bước chưa hợp lý.
+- Cập nhật tài liệu kế hoạch, chuẩn bị nội dung cho buổi báo cáo giữa kỳ (nếu có) về tiến độ 6/9 tuần.
+Thân Tuấn Vũ & Dương Văn Tuân
+- Lập trình chức năng quản lý lịch làm việc bác sĩ/nhân viên (UC009): thiết lập ca trực theo tuần, đồng bộ dữ liệu cho chức năng đặt lịch.
+- Lập trình chức năng đặt lịch khám (UC003) với kiểm tra khung giờ trống theo thời gian thực, tránh trùng lịch.
+- Lập trình chức năng quản lý lịch hẹn & hàng đợi khám (UC004): check-in, chuyển trạng thái Đã xác nhận → Đã check-in → Đang khám → Hoàn thành.
+- Lập trình chức năng khám bệnh & lập hồ sơ khám (UC005), kê đơn thuốc (UC006) và quản lý danh mục thuốc (UC014).
+- Lập trình chức năng thanh toán & lập hóa đơn (UC007): tự động tổng hợp chi phí khám, dịch vụ, thuốc.
+- Xây dựng đầy đủ giao diện cho tất cả các chức năng trên: Form đặt lịch, Form quản lý lịch hẹn/hàng đợi, Form khám bệnh, Form kê đơn thuốc, Form hóa đơn/thanh toán, Form quản lý dịch vụ và danh mục thuốc.
+4. Kết quả cụ thể đạt được
+- 7 chức năng cốt lõi đã lập trình hoàn chỉnh: UC003, UC004, UC005, UC006, UC007, UC008, UC009, UC014.
+- 7 màn hình giao diện mới đã hoàn thành, tổng cộng 11 màn hình từ đầu dự án đến nay.
+- Demo được toàn bộ luồng nghiệp vụ chính: bệnh nhân đặt lịch → lễ tân check-in → bác sĩ khám và kê đơn → lễ tân lập hóa đơn và thu tiền.
+- Hệ thống đã sẵn sàng về mặt nghiệp vụ cốt lõi (chưa tích hợp AI) để chuyển sang tuần 7.
+5. Số liệu tổng kết tuần
+Nội dung
+Số liệu
+
+Số Use Case đã lập trình xong trong tuần
+7 UC
+
+Tổng số Use Case đã hoàn thành (lũy kế)
+10/14 UC
+
+Số màn hình giao diện mới
+7 màn hình
+
+Tổng số màn hình (lũy kế)
+11 màn hình
+
+6. Khó khăn và hướng giải quyết
+Khó khăn
+Nguyên nhân
+Cách giải quyết
+
+Chức năng kiểm tra khung giờ trống theo thời gian thực đôi khi vẫn cho phép đặt trùng lịch khi 2 người thao tác cùng lúc.
+Chưa xử lý tình huống tranh chấp dữ liệu (race condition) khi nhiều yêu cầu đặt lịch gửi lên gần như đồng thời.
+Bổ sung kiểm tra và khóa tạm thời (transaction) ở tầng cơ sở dữ liệu khi xác nhận đặt lịch.
+
+Khối lượng công việc lập trình trong tuần khá lớn (7 chức năng), Vũ phải làm việc ngoài giờ để kịp tiến độ.
+Tuần 6 gộp nhiều chức năng nghiệp vụ cốt lõi còn lại để dành tuần 7 tập trung riêng cho AI.
+Tuân hỗ trợ thêm một phần xử lý phía Backend đơn giản (như API danh mục thuốc) để chia sẻ khối lượng công việc với Vũ.
+
+7. Kế hoạch tuần tiếp theo
+- Tích hợp AI Chatbot sàng lọc triệu chứng (UC010) sử dụng kỹ thuật RAG.
+- Tích hợp AI trợ lý bác sĩ: tóm tắt bệnh án và cảnh báo tương tác thuốc (UC011).
+- Thiết kế và xây dựng giao diện tương tác cho 2 tính năng AI.
+

@@ -1,0 +1,103 @@
+﻿
+BÁO CÁO TIẾN ĐỘ TUẦN 05
+Đề tài: Hệ thống Quản lý Phòng khám có Tích hợp AI – Nhóm 03
+Thời gian: 24/08/2026 – 30/08/2026  |  Chủ đề tuần: Xây dựng chức năng cốt lõi (đợt 1)
+1. Mục tiêu của tuần
+Xây dựng xong cơ sở dữ liệu thực tế và lập trình hoàn chỉnh nhóm chức năng đầu tiên: đăng nhập/đăng ký, phân quyền, quản lý hồ sơ bệnh nhân — có thể chạy demo được trên môi trường phát triển.
+2. Lịch làm việc chi tiết theo ngày
+Ngày
+Công việc cụ thể
+Người phụ trách
+
+Thứ 2 (24/08)
+Họp đầu tuần, chốt công nghệ sử dụng (ReactJS, Node.js/Spring Boot, MySQL/PostgreSQL), khởi tạo mã nguồn dùng chung trên GitHub
+Cả nhóm
+
+Thứ 3 (25/08)
+Tạo cơ sở dữ liệu thực tế theo biểu đồ lớp đã thiết kế (13 bảng chính)
+Vũ
+
+Thứ 3 (25/08)
+Xây dựng khung giao diện chung (layout, menu điều hướng theo vai trò)
+Tuân
+
+Thứ 4 (26/08)
+Lập trình chức năng đăng ký/đăng nhập, cấp phiên đăng nhập (UC001)
+Vũ
+
+Thứ 4 (26/08)
+Xây dựng giao diện Form đăng ký và Form đăng nhập
+Tuân
+
+Thứ 5 (27/08)
+Lập trình chức năng phân quyền RBAC theo 4 vai trò (nền tảng cho UC012)
+Vũ
+
+Thứ 6 (28/08)
+Lập trình chức năng quản lý hồ sơ bệnh nhân: thêm/sửa/tìm kiếm/xem chi tiết (UC002)
+Vũ
+
+Thứ 6 (28/08)
+Xây dựng giao diện trang tổng quan theo từng vai trò và giao diện hồ sơ bệnh nhân
+Tuân
+
+Thứ 7 (29/08)
+Kiểm thử nhanh (unit test thủ công) các chức năng vừa xây dựng, sửa lỗi phát sinh
+Cả nhóm
+
+Chủ nhật (30/08)
+Họp tổng kết tuần 5, demo nội bộ các chức năng đã hoàn thành, chuẩn bị cho tuần 6
+Cả nhóm
+
+3. Chi tiết công việc từng thành viên
+Bùi Đức Minh (Trưởng nhóm)
+- Theo dõi tiến độ lập trình của Vũ và Tuân theo đúng kế hoạch, cập nhật tài liệu kế hoạch theo từng chức năng đã hoàn thành.
+- Kiểm tra chức năng đã xây dựng có khớp với đặc tả Use Case trong SRS hay không (đối chiếu UC001, UC002, UC012).
+- Chuẩn bị dữ liệu mẫu (mock data): danh sách bệnh nhân, bác sĩ, nhân viên giả lập để phục vụ demo và kiểm thử ở các tuần sau.
+Thân Tuấn Vũ & Dương Văn Tuân
+- Xây dựng cơ sở dữ liệu thực tế (MySQL/PostgreSQL) với 13 bảng chính theo đúng biểu đồ lớp đã thiết kế ở tuần 4, thiết lập khóa chính/khóa ngoại giữa các bảng.
+- Lập trình hoàn chỉnh chức năng đăng ký/đăng nhập (UC001): mã hóa mật khẩu, cấp JWT Token, gửi OTP khi cần xác thực thêm.
+- Lập trình cơ chế phân quyền RBAC: middleware kiểm tra quyền truy cập theo vai trò cho từng API.
+- Lập trình chức năng quản lý hồ sơ bệnh nhân (UC002): API thêm mới, cập nhật, tìm kiếm và tra cứu chi tiết hồ sơ theo quyền truy cập.
+- Xây dựng khung giao diện chung (menu điều hướng thay đổi theo vai trò đăng nhập) và các Form: đăng ký, đăng nhập, trang tổng quan, hồ sơ bệnh nhân.
+4. Kết quả cụ thể đạt được
+- Cơ sở dữ liệu thực tế với 13 bảng đã được tạo và kết nối với Backend.
+- Chức năng đăng ký/đăng nhập hoạt động đầy đủ (UC001), có mã hóa mật khẩu và cấp token.
+- Cơ chế phân quyền RBAC áp dụng cho 4 vai trò.
+- Chức năng quản lý hồ sơ bệnh nhân hoạt động đầy đủ (UC002).
+- 4 màn hình giao diện đã hoàn thành: Đăng ký, Đăng nhập, Trang tổng quan, Hồ sơ bệnh nhân.
+- Demo nội bộ chạy được luồng: đăng ký → đăng nhập → xem/tạo hồ sơ bệnh nhân.
+5. Số liệu tổng kết tuần
+Nội dung
+Số liệu
+
+Số bảng cơ sở dữ liệu đã tạo
+13 bảng
+
+Số Use Case đã lập trình xong
+3 UC (UC001, UC002, UC012 nền tảng)
+
+Số màn hình giao diện đã hoàn thành
+4 màn hình
+
+Số buổi họp/demo nội bộ
+2 buổi
+
+6. Khó khăn và hướng giải quyết
+Khó khăn
+Nguyên nhân
+Cách giải quyết
+
+Việc thiết lập quan hệ khóa ngoại giữa 13 bảng dữ liệu phức tạp hơn dự kiến, một vài bảng phải chỉnh sửa lại cấu trúc.
+Biểu đồ lớp ở tuần 4 chưa tính hết một số ràng buộc dữ liệu thực tế khi triển khai CSDL.
+Vũ và Tuân cùng rà soát lại, điều chỉnh cấu trúc bảng cho phù hợp trước khi lập trình các chức năng tiếp theo.
+
+Cả Vũ và Tuân đều lần đầu làm việc chung trên cùng một mã nguồn qua GitHub nên gặp một số xung đột (conflict) khi merge code.
+Nhóm chưa thống nhất quy tắc đặt tên nhánh (branch) và thời điểm merge ngay từ đầu.
+Thống nhất quy tắc: mỗi người làm việc trên 1 nhánh riêng, merge vào nhánh chính sau khi đã kiểm thử xong chức năng.
+
+7. Kế hoạch tuần tiếp theo
+- Lập trình chức năng cốt lõi đợt 2: đặt lịch khám, quản lý lịch làm việc bác sĩ, kê đơn thuốc, dịch vụ và hóa đơn.
+- Xây dựng giao diện cho các màn hình đặt lịch, quản lý lịch hẹn, kê đơn, hóa đơn.
+- Tiếp tục kiểm thử và sửa lỗi cho các chức năng đã hoàn thành ở tuần 5.
+

@@ -1,0 +1,143 @@
+﻿
+BÁO CÁO TIẾN ĐỘ TUẦN 01
+Đề tài: Hệ thống Quản lý Phòng khám có Tích hợp AI – Nhóm 03
+Thời gian: 27/07/2026 – 02/08/2026  |  Chủ đề tuần: Khảo sát và phân tích bài toán
+Ghi chú kiểm tra (đối chiếu báo cáo mẫu):
+Đối chiếu với báo cáo mẫu (Chương II – Lập kế hoạch dự án), tuần 1 còn thiếu 2 nội dung bắt buộc: "Lý do chọn đề tài" và "Phân tích rủi ro dự án" (bảng rủi ro theo đúng chuẩn báo cáo môn Phân tích thiết kế hệ thống). Đã bổ sung 2 mục mới bên dưới (mục 8, 9), không xóa nội dung cũ.
+1. Mục tiêu của tuần
+Nắm được quy trình hoạt động thực tế của một phòng khám tư nhân quy mô nhỏ, chốt được phạm vi đề tài với 13 chức năng chính (không bao gồm quản lý bảo hiểm y tế và quản lý chi tiết kho thuốc), và có bản kế hoạch thực hiện chi tiết cho toàn bộ 9 tuần.
+2. Lịch làm việc chi tiết theo ngày
+Ngày
+Công việc cụ thể
+Người phụ trách
+
+Thứ 2 (27/07)
+Họp nhóm mở đầu: thống nhất công cụ làm việc chung (Google Drive, Zalo nhóm, GitHub); phân công nhiệm vụ tuần 1
+Cả nhóm
+
+Thứ 3 (28/07)
+Đọc và tổng hợp 4 tài liệu về quy trình quản lý phòng khám tư nhân tại Việt Nam
+Minh
+
+Thứ 3 (28/07)
+Dùng thử và ghi chú giao diện của 3 phần mềm quản lý phòng khám phổ biến (eDoctor, Med247, MedPro)
+Vũ, Tuân
+
+Thứ 4 (29/07)
+Họp nhóm trao đổi kết quả khảo sát, thống nhất phạm vi đề tài (chốt 13 chức năng chính)
+Cả nhóm
+
+Thứ 5 (30/07)
+Viết mục "Mục đích" và "Phạm vi" trong tài liệu đặc tả yêu cầu
+Minh
+
+Thứ 5 (30/07)
+Liệt kê 4 nhóm người dùng của hệ thống và mô tả sơ bộ vai trò từng nhóm
+Vũ, Tuân
+
+Thứ 6 (31/07)
+Viết mô tả sơ bộ (chưa đi sâu kỹ thuật) cho 2 ý tưởng AI: chatbot hỏi - đáp triệu chứng và trợ lý tóm tắt bệnh án
+Vũ, Tuân
+
+Thứ 7 (01/08)
+Tổng hợp toàn bộ nội dung thành bản kế hoạch thực hiện chi tiết 9 tuần
+Minh
+
+Chủ nhật (02/08)
+Họp tổng kết tuần 1, rà soát lại kế hoạch trước khi bắt đầu tuần 2
+Cả nhóm
+
+3. Chi tiết công việc từng thành viên
+Bùi Đức Minh (Trưởng nhóm)
+- Đọc và tổng hợp 4 tài liệu/bài viết về mô hình hoạt động của phòng khám tư nhân quy mô nhỏ tại Việt Nam, ghi chú lại các bước chính: tiếp đón, khám, kê đơn, thu phí.
+- Soạn thảo 2 mục đầu tiên của tài liệu đặc tả yêu cầu ứng dụng: mục "Mục đích" (nêu rõ tài liệu dùng để làm gì) và mục "Phạm vi" (giới hạn 13 chức năng chính sẽ xây dựng; nêu rõ 2 nội dung không thuộc phạm vi đề tài là quản lý bảo hiểm y tế và quản lý chi tiết kho thuốc).
+- Tổng hợp toàn bộ kết quả làm việc của cả nhóm trong tuần thành bản kế hoạch thực hiện chi tiết, chia thành 9 tuần với đầu việc và người phụ trách rõ ràng cho từng tuần.
+- Chủ trì 3 buổi họp nhóm trong tuần (đầu tuần, giữa tuần, cuối tuần) để thống nhất định hướng chung.
+Thân Tuấn Vũ & Dương Văn Tuân
+- Dùng thử và ghi chú lại cách bố trí màn hình của 3 phần mềm quản lý phòng khám phổ biến hiện nay (trang chủ, trang đặt lịch, trang hồ sơ bệnh nhân) để làm tài liệu tham khảo cho việc thiết kế giao diện ở các tuần sau.
+- Liệt kê chi tiết 4 nhóm người dùng của hệ thống: Bệnh nhân, Nhân viên (lễ tân, thu ngân), Bác sĩ, Quản trị viên (Admin); với mỗi nhóm ghi rõ họ sẽ dùng hệ thống để làm gì.
+- Viết mô tả ngắn gọn cho 2 tính năng AI dự kiến: (1) khung chat để bệnh nhân mô tả triệu chứng và nhận gợi ý chuyên khoa; (2) tính năng tự động tóm tắt lại các lần khám trước để bác sĩ xem nhanh trước khi khám.
+- Cùng nhau vẽ tay sơ đồ đơn giản mô tả các bước trong quy trình khám bệnh: đặt lịch → tiếp nhận → khám → kê đơn → thanh toán.
+4. Kết quả cụ thể đạt được
+- 4 tài liệu tham khảo về quy trình phòng khám đã được tổng hợp thành 1 trang ghi chú chung.
+- Chốt được phạm vi đề tài với 13 chức năng chính (khớp với 13 Use Case UC001–UC013, sau bổ sung thành 14 UC ở tuần 2).
+- Tài liệu đặc tả yêu cầu đã hoàn thành 2/4 mục trong phần "Giới thiệu chung".
+- Danh sách 4 nhóm người dùng kèm mô tả vai trò cụ thể.
+- Mô tả sơ bộ cho 2 tính năng AI cốt lõi của hệ thống.
+- Bản kế hoạch thực hiện chi tiết 9 tuần hoàn chỉnh, đã được cả nhóm thống nhất.
+5. Số liệu tổng kết tuần
+Nội dung
+Số liệu
+
+Số buổi họp nhóm
+3 buổi
+
+Số tài liệu tham khảo đã đọc
+4 tài liệu
+
+Số phần mềm tham khảo giao diện
+3 phần mềm
+
+Số nhóm người dùng đã xác định
+4 nhóm
+
+Số chức năng chính đã chốt
+13 chức năng
+
+6. Khó khăn và hướng giải quyết
+Khó khăn
+Nguyên nhân
+Cách giải quyết
+
+Thành viên chưa có kinh nghiệm thực tế trong ngành y tế nên khó hình dung đầy đủ quy trình khám bệnh.
+Không ai trong nhóm từng làm việc hoặc thực tập tại phòng khám.
+Tham khảo thêm bài viết, video hướng dẫn quy trình khám bệnh trên mạng; hỏi thêm ý kiến giảng viên hướng dẫn khi có phần chưa rõ.
+
+Việc thống nhất phạm vi đề tài mất nhiều thời gian hơn dự kiến vì nhóm muốn làm nhiều chức năng.
+Nhóm ban đầu liệt kê hơn 18 chức năng mong muốn, vượt quá khả năng hoàn thành trong 9 tuần.
+Họp riêng 1 buổi để ưu tiên hóa, chỉ giữ lại 13 chức năng cốt lõi và quan trọng nhất.
+
+7. Kế hoạch tuần tiếp theo
+- Hoàn thiện toàn bộ tài liệu đặc tả yêu cầu (bổ sung mục thuật ngữ, tài liệu tham khảo).
+- Phân tích chi tiết 5 quy trình nghiệp vụ chính, xác định rõ dữ liệu cần cho từng bước.
+- Phác thảo sơ bộ ít nhất 4 màn hình chính bằng giấy hoặc công cụ vẽ đơn giản.
+8. Lý do chọn đề tài
+Nhóm chọn đề tài "Hệ thống Quản lý Phòng khám có Tích hợp AI" vì ba lý do chính:
+- Đây là bài toán quản lý thực tế, gần gũi với đời sống, dễ hình dung yêu cầu và dễ kiểm chứng kết quả khi demo.
+- Đề tài cho phép nhóm ứng dụng kiến thức về trí tuệ nhân tạo (chatbot, xử lý ngôn ngữ tự nhiên, kỹ thuật RAG) vào một lĩnh vực có ý nghĩa xã hội cao là y tế, phù hợp định hướng học tập của nhóm.
+- Phạm vi đề tài (13 chức năng, 4 tác nhân) vừa đủ để 3 thành viên hoàn thành trong 9 tuần với chất lượng tốt, không quá tải nhưng vẫn đủ chiều sâu để phân tích, thiết kế và tích hợp AI.
+9. Phân tích rủi ro dự án
+9.1. Dự đoán rủi ro
+Nhóm xác định các rủi ro có thể ảnh hưởng đến tiến độ và chất lượng dự án ngay từ tuần đầu tiên, làm cơ sở theo dõi trong suốt 9 tuần.
+9.2. Bảng phân tích quản lý rủi ro
+Rủi ro
+Mức độ ảnh hưởng
+Khả năng xảy ra
+Biện pháp phòng ngừa
+
+Thành viên thiếu kinh nghiệm thực tế về quy trình y tế
+Trung bình
+Cao
+Tham khảo tài liệu, hỏi ý kiến giảng viên, tham khảo phần mềm có sẵn
+
+Trễ tiến độ do khối lượng công việc lớn trong 9 tuần
+Cao
+Trung bình
+Lập kế hoạch chi tiết theo tuần, họp rà soát tiến độ hàng tuần
+
+Tích hợp AI (chatbot, cảnh báo thuốc) phức tạp hơn dự kiến
+Cao
+Trung bình
+Dành riêng tuần 7 tập trung cho AI; có phương án đơn giản hóa nếu không kịp
+
+Thiếu dữ liệu mẫu (bệnh nhân, thuốc) để kiểm thử
+Trung bình
+Trung bình
+Tự tạo bộ dữ liệu giả lập (mock data) ngay từ đầu
+
+Xung đột lịch học/lịch cá nhân giữa các thành viên
+Thấp
+Trung bình
+Thống nhất lịch họp cố định hàng tuần, trao đổi qua Zalo nhóm khi cần
+
+

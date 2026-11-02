@@ -1,0 +1,98 @@
+﻿
+BÁO CÁO TIẾN ĐỘ TUẦN 09
+Đề tài: Hệ thống Quản lý Phòng khám có Tích hợp AI – Nhóm 03
+Thời gian: 21/09/2026 – 27/09/2026  |  Chủ đề tuần: Triển khai chính thức và tổng kết
+1. Mục tiêu của tuần
+Triển khai hệ thống lên môi trường vận hành thử nghiệm, hoàn thiện toàn bộ tài liệu báo cáo, chuẩn bị nội dung thuyết trình và tổng kết lại toàn bộ quá trình thực hiện đề tài trong 9 tuần.
+2. Lịch làm việc chi tiết theo ngày
+Ngày
+Công việc cụ thể
+Người phụ trách
+
+Thứ 2 (21/09)
+Họp đầu tuần, rà soát danh sách công việc còn lại trước khi báo cáo
+Cả nhóm
+
+Thứ 3 (22/09)
+Cài đặt chính thức hệ thống lên môi trường vận hành thử nghiệm (cloud miễn phí)
+Vũ
+
+Thứ 3 (22/09)
+Kiểm tra lần cuối toàn bộ chức năng trên môi trường vừa triển khai
+Tuân
+
+Thứ 4 (23/09)
+Hoàn thiện tài liệu báo cáo đề tài (tổng hợp SRS, kế hoạch, kết quả kiểm thử)
+Minh
+
+Thứ 5 (24/09)
+Chuẩn bị nội dung minh họa hoạt động của hệ thống phục vụ buổi báo cáo (kịch bản demo)
+Minh
+
+Thứ 5 (24/09)
+Ghi lại video/ảnh chụp demo dự phòng trong trường hợp sự cố khi thuyết trình trực tiếp
+Vũ, Tuân
+
+Thứ 6 (25/09)
+Chuẩn bị slide trình chiếu và phân công nội dung thuyết trình cho từng thành viên
+Cả nhóm
+
+Thứ 7 (26/09)
+Tổng duyệt thử toàn bộ buổi báo cáo (thuyết trình + demo trực tiếp)
+Cả nhóm
+
+Chủ nhật (27/09)
+Tổng duyệt, thuyết trình và bàn giao sản phẩm
+Cả nhóm
+
+3. Chi tiết công việc từng thành viên
+Bùi Đức Minh (Trưởng nhóm)
+- Tổng hợp toàn bộ tài liệu của dự án (kế hoạch thực hiện, thu thập yêu cầu, đặc tả SRS, báo cáo kiểm thử, báo cáo tiến độ 9 tuần) thành một bộ hồ sơ báo cáo hoàn chỉnh.
+- Chuẩn bị kịch bản demo minh họa xuyên suốt các chức năng chính: đăng ký/đăng nhập → đặt lịch → khám bệnh → kê đơn (có cảnh báo AI) → thanh toán → chatbot AI tư vấn.
+- Đảm nhiệm vai trò thuyết trình chính, nắm toàn bộ luồng hệ thống để trả lời câu hỏi của giảng viên.
+Thân Tuấn Vũ & Dương Văn Tuân
+- Cài đặt chính thức hệ thống lên môi trường vận hành thử nghiệm (Render/Vercel/Railway), cấu hình biến môi trường, kết nối cơ sở dữ liệu và dịch vụ AI trên môi trường thật.
+- Kiểm tra lần cuối toàn bộ 14 Use Case trên môi trường vừa triển khai, đảm bảo không phát sinh lỗi khác so với môi trường phát triển.
+- Ghi lại video/ảnh chụp demo dự phòng cho các tính năng quan trọng (đặc biệt là 2 tính năng AI) đề phòng sự cố mạng khi thuyết trình trực tiếp.
+- Hỗ trợ chuẩn bị slide phần kỹ thuật (kiến trúc hệ thống, công nghệ sử dụng, sơ đồ Use Case) và tham gia thuyết trình phần Backend/AI.
+4. Kết quả cụ thể đạt được
+- Hệ thống đã được triển khai thành công lên môi trường vận hành thử nghiệm, hoạt động ổn định.
+- Bộ hồ sơ báo cáo đề tài hoàn chỉnh, tổng hợp đầy đủ từ tuần 1 đến tuần 9.
+- Kịch bản demo và video dự phòng đã sẵn sàng cho buổi báo cáo.
+- Cả nhóm đã tổng duyệt thử buổi báo cáo, phân công rõ nội dung thuyết trình từng thành viên.
+- Hoàn thành bàn giao sản phẩm đúng tiến độ 9 tuần đã đề ra trong kế hoạch ban đầu.
+5. Số liệu tổng kết tuần
+Nội dung
+Số liệu
+
+Số Use Case hoạt động ổn định trên môi trường triển khai
+14/14 UC
+
+Số tài liệu trong bộ hồ sơ báo cáo
+7 tài liệu
+
+Số buổi tổng duyệt thuyết trình
+2 buổi
+
+6. Khó khăn và hướng giải quyết
+Khó khăn
+Nguyên nhân
+Cách giải quyết
+
+Khi triển khai lên môi trường cloud miễn phí, tốc độ phản hồi ban đầu chậm hơn so với môi trường phát triển cục bộ (do giới hạn tài nguyên của gói miễn phí).
+Dịch vụ cloud miễn phí có giới hạn cấu hình CPU/RAM và có thể "ngủ" (sleep) sau thời gian không sử dụng.
+Ghi chú rõ trong báo cáo đây là giới hạn của môi trường demo miễn phí, không phải lỗi hệ thống; chuẩn bị sẵn video demo dự phòng.
+
+7. Kế hoạch tuần tiếp theo
+- Không còn tuần tiếp theo trong phạm vi 9 tuần của đề tài — đây là mục kế hoạch mở rộng nếu dự án được phát triển tiếp: bổ sung nhắc lịch tái khám tự động, quản lý kho thuốc chi tiết, và mở rộng cơ sở tri thức y khoa cho chatbot AI.
+8. Kết luận dự án
+Sau 9 tuần thực hiện, nhóm 03 đã hoàn thành đầy đủ các mục tiêu đề ra ban đầu: xây dựng thành công Hệ thống Quản lý Phòng khám có Tích hợp AI với 14 Use Case, 4 nhóm người dùng, và 2 tính năng trí tuệ nhân tạo cốt lõi (chatbot sàng lọc triệu chứng dùng kỹ thuật RAG, và trợ lý AI hỗ trợ bác sĩ tóm tắt bệnh án/cảnh báo tương tác thuốc). Hệ thống đã được kiểm thử và triển khai thử nghiệm thành công trên môi trường cloud.
+Qua quá trình thực hiện, nhóm đã học được cách phân tích và đặc tả yêu cầu phần mềm theo chuẩn (SRS, Use Case), thiết kế hệ thống bằng các biểu đồ UML (lớp, trạng thái, tuần tự), lập trình một hệ thống web đầy đủ Frontend–Backend–Cơ sở dữ liệu, và bước đầu tích hợp trí tuệ nhân tạo tạo sinh vào một bài toán nghiệp vụ thực tế.
+9. Tài liệu tham khảo
+- Kế hoạch thực hiện – Phát triển ứng dụng chuyên sâu (Nhóm 03).
+- Thu thập, làm rõ yêu cầu của ứng dụng (Nhóm 03).
+- Đặc tả yêu cầu phần mềm (SRS) – Hệ thống Quản lý Phòng khám có Tích hợp AI (Nhóm 03).
+- Chuẩn IEEE Std 830-1998 – Software Requirements Specifications.
+- Tài liệu kỹ thuật RAG (Retrieval-Augmented Generation), Lewis et al., 2020.
+- Tài liệu API của nhà cung cấp mô hình ngôn ngữ lớn (LLM Provider API Docs).
+

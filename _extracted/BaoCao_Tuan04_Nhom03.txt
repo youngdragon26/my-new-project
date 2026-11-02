@@ -1,0 +1,102 @@
+﻿
+BÁO CÁO TIẾN ĐỘ TUẦN 04
+Đề tài: Hệ thống Quản lý Phòng khám có Tích hợp AI – Nhóm 03
+Thời gian: 17/08/2026 – 23/08/2026  |  Chủ đề tuần: Thiết kế chi tiết
+1. Mục tiêu của tuần
+Hoàn thiện đặc tả kỹ thuật chi tiết cho toàn bộ 14 Use Case (kịch bản, điều kiện, luồng sự kiện), có biểu đồ lớp, biểu đồ trạng thái và biểu đồ tuần tự cho các nghiệp vụ chính, cùng thiết kế cơ chế đăng nhập, xác thực và phân quyền — làm nền tảng để bắt đầu lập trình từ tuần 5.
+2. Lịch làm việc chi tiết theo ngày
+Ngày
+Công việc cụ thể
+Người phụ trách
+
+Thứ 2 (17/08)
+Họp đầu tuần, rà soát tài liệu thiết kế tuần 3, phân công công việc tuần 4
+Cả nhóm
+
+Thứ 3 (18/08)
+Viết đặc tả chi tiết cho 6 Use Case đầu (UC001–UC006): tác nhân, tiền điều kiện, luồng sự kiện chính/phụ
+Minh, Vũ, Tuân
+
+Thứ 4 (19/08)
+Viết đặc tả chi tiết cho 8 Use Case còn lại (UC007–UC014)
+Minh, Vũ, Tuân
+
+Thứ 4 (19/08)
+Thiết kế biểu đồ lớp (Class Diagram): xác định các lớp chính và quan hệ giữa chúng
+Vũ, Tuân
+
+Thứ 5 (20/08)
+Thiết kế biểu đồ trạng thái (State Diagram) cho "Lịch hẹn" và "Đơn thuốc"
+Vũ, Tuân
+
+Thứ 6 (21/08)
+Thiết kế biểu đồ tuần tự (Sequence Diagram) cho UC003 (Đặt lịch khám) và UC006 (Kê đơn thuốc)
+Vũ, Tuân
+
+Thứ 6 (21/08)
+Thiết kế cơ chế đăng nhập, xác thực (JWT + OTP) và phân quyền RBAC chi tiết
+Vũ
+
+Thứ 7 (22/08)
+Thiết kế chi tiết giao diện cho từng màn hình cụ thể (bố cục, thành phần, dữ liệu hiển thị)
+Tuân
+
+Chủ nhật (23/08)
+Họp tổng kết tuần 4, rà soát toàn bộ tài liệu thiết kế trước khi bắt đầu lập trình ở tuần 5
+Cả nhóm
+
+3. Chi tiết công việc từng thành viên
+Bùi Đức Minh (Trưởng nhóm)
+- Tổng hợp và rà soát đặc tả chi tiết cho toàn bộ 14 Use Case, đảm bảo văn phong nhất quán và đầy đủ các trường: Tác nhân chính/phụ, Tiền điều kiện, Đảm bảo tối thiểu/thành công, Kích hoạt, Luồng sự kiện chính, Ngoại lệ — hoàn thiện tài liệu "Đặc tả yêu cầu phần mềm (SRS)".
+- Kiểm tra tính nhất quán giữa đặc tả Use Case với danh sách chức năng đã chốt ở tuần 1–2, đảm bảo không thiếu hoặc thừa Use Case nào.
+- Cập nhật kế hoạch thực hiện, chuẩn bị phân công công việc lập trình cụ thể cho tuần 5–7 (theo hướng Vũ phụ trách chính Backend, Tuân phụ trách chính Frontend).
+Thân Tuấn Vũ & Dương Văn Tuân
+- Thiết kế biểu đồ lớp (Class Diagram) với các lớp chính: NguoiDung, BenhNhan, BacSi, NhanVien, Admin, LichHen, HoSoKhamBenh, DonThuoc, ChiTietDonThuoc, DichVuKham, HoaDon, ThuocDanhMuc, TuongTacThuoc — xác định thuộc tính chính và quan hệ (1-n, n-n) giữa các lớp.
+- Thiết kế biểu đồ trạng thái (State Diagram) cho đối tượng "Lịch hẹn" (Chờ xác nhận → Đã xác nhận → Đã check-in → Đang khám → Hoàn thành / Đã hủy / Đến muộn) và đối tượng "Đơn thuốc" (Đang soạn → Đã cảnh báo tương tác → Đã lưu).
+- Thiết kế biểu đồ tuần tự (Sequence Diagram) mô tả tương tác giữa Frontend – Backend – Cơ sở dữ liệu cho 2 luồng chính: đặt lịch khám (UC003) và kê đơn thuốc có kiểm tra cảnh báo tương tác (UC006, UC011).
+- Thiết kế chi tiết cơ chế đăng nhập/xác thực (cấp JWT Token, xác thực OTP khi cần) và ma trận phân quyền RBAC cho 4 vai trò người dùng.
+- Thiết kế chi tiết giao diện cho từng màn hình cụ thể: xác định rõ vị trí các thành phần (form nhập liệu, bảng danh sách, nút thao tác) cho 6+ màn hình chính.
+4. Kết quả cụ thể đạt được
+- Tài liệu SRS hoàn chỉnh với đặc tả chi tiết cho đầy đủ 14 Use Case.
+- Biểu đồ lớp với 13 lớp chính và các quan hệ giữa chúng.
+- Biểu đồ trạng thái cho 2 đối tượng nghiệp vụ quan trọng (Lịch hẹn, Đơn thuốc).
+- Biểu đồ tuần tự cho 2 luồng nghiệp vụ chính (đặt lịch, kê đơn).
+- Thiết kế cơ chế xác thực và ma trận phân quyền RBAC hoàn chỉnh cho 4 vai trò.
+- Thiết kế chi tiết giao diện cho toàn bộ màn hình chính, sẵn sàng để lập trình.
+5. Số liệu tổng kết tuần
+Nội dung
+Số liệu
+
+Số Use Case đã đặc tả chi tiết
+14/14 UC
+
+Số lớp trong biểu đồ lớp
+13 lớp
+
+Số biểu đồ trạng thái
+2 biểu đồ
+
+Số biểu đồ tuần tự
+2 biểu đồ
+
+Số vai trò trong ma trận phân quyền
+4 vai trò
+
+6. Khó khăn và hướng giải quyết
+Khó khăn
+Nguyên nhân
+Cách giải quyết
+
+Một số Use Case có luồng ngoại lệ phức tạp (ví dụ UC010 AI Chatbot) khiến việc đặc tả đầy đủ các trường hợp mất nhiều thời gian.
+Đây là Use Case liên quan đến AI, có nhiều nhánh xử lý (triệu chứng không rõ ràng, trường hợp khẩn cấp, không truy xuất được dữ liệu...).
+Dành thêm 1 buổi riêng để rà soát kỹ luồng ngoại lệ, tham khảo cách xử lý tương tự trong file mẫu.
+
+Nhóm chưa có kinh nghiệm vẽ biểu đồ UML (lớp, trạng thái, tuần tự) nên bản vẽ đầu tiên còn đơn giản, thiếu chi tiết.
+Đây là lần đầu nhóm thực hành các loại biểu đồ này trong một dự án thực tế.
+Tham khảo lại cấu trúc biểu đồ trong báo cáo mẫu của môn học, chỉnh sửa lại cho đúng chuẩn UML.
+
+7. Kế hoạch tuần tiếp theo
+- Xây dựng cơ sở dữ liệu thực tế theo biểu đồ lớp đã thiết kế.
+- Lập trình các chức năng cốt lõi đợt 1: đăng nhập/đăng ký, phân quyền, hồ sơ bệnh nhân.
+- Xây dựng giao diện cho các màn hình cốt lõi đợt 1.
+

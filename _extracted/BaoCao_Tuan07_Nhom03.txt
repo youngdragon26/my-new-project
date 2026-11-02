@@ -1,0 +1,106 @@
+﻿
+BÁO CÁO TIẾN ĐỘ TUẦN 07
+Đề tài: Hệ thống Quản lý Phòng khám có Tích hợp AI – Nhóm 03
+Thời gian: 07/09/2026 – 13/09/2026  |  Chủ đề tuần: Xây dựng và tích hợp trí tuệ nhân tạo
+1. Mục tiêu của tuần
+Tích hợp thành công 2 tính năng AI cốt lõi của hệ thống: AI Chatbot sàng lọc triệu chứng (UC010, dùng kỹ thuật RAG) và AI trợ lý bác sĩ tóm tắt bệnh án & cảnh báo tương tác thuốc (UC011).
+2. Lịch làm việc chi tiết theo ngày
+Ngày
+Công việc cụ thể
+Người phụ trách
+
+Thứ 2 (07/09)
+Họp đầu tuần, xác định cụ thể kiến trúc tích hợp AI (LLM API, Vector DB), phân công công việc tuần 7
+Cả nhóm
+
+Thứ 3 (08/09)
+Xây dựng cơ sở tri thức y khoa (tài liệu triệu chứng – chuyên khoa) và tạo embedding lưu vào Vector DB
+Vũ
+
+Thứ 3 (08/09)
+Xây dựng giao diện khung chat AI cho bệnh nhân
+Tuân
+
+Thứ 4 (09/09)
+Lập trình luồng RAG: nhận câu hỏi → truy vấn Vector DB → ghép ngữ cảnh → gọi LLM sinh câu trả lời
+Vũ
+
+Thứ 5 (10/09)
+Thiết kế và thử nghiệm prompt cho chatbot (Prompt Engineering), xử lý các tình huống khẩn cấp/không rõ ràng
+Vũ
+
+Thứ 5 (10/09)
+Hoàn thiện giao diện chat: hiển thị gợi ý chuyên khoa kèm nút "Đặt lịch ngay"
+Tuân
+
+Thứ 6 (11/09)
+Lập trình chức năng AI tóm tắt bệnh án: gửi lịch sử khám tới LLM theo prompt tóm tắt y khoa, hiển thị cho bác sĩ
+Vũ
+
+Thứ 6 (11/09)
+Xây dựng giao diện hiển thị bản tóm tắt AI trong màn hình khám bệnh
+Tuân
+
+Thứ 7 (12/09)
+Lập trình chức năng AI cảnh báo tương tác thuốc, tích hợp vào màn hình kê đơn (UC006)
+Vũ, Tuân
+
+Chủ nhật (13/09)
+Họp tổng kết tuần 7, demo đầy đủ 2 tính năng AI, kiểm tra lại các tình huống ngoại lệ
+Cả nhóm
+
+3. Chi tiết công việc từng thành viên
+Bùi Đức Minh (Trưởng nhóm)
+- Xác định cụ thể các tình huống ứng dụng trí tuệ nhân tạo phù hợp với phòng khám, cập nhật vào tài liệu hệ thống.
+- Thử nghiệm trực tiếp chatbot với nhiều kịch bản triệu chứng khác nhau (thông thường, không rõ ràng, khẩn cấp) để đánh giá chất lượng câu trả lời.
+- Soát lại các khuyến cáo an toàn AI: đảm bảo mọi kết quả AI đều có ghi chú "chỉ mang tính tham khảo, không thay thế chẩn đoán của bác sĩ" theo đúng yêu cầu phi chức năng (AI Governance) trong SRS.
+Thân Tuấn Vũ & Dương Văn Tuân
+- Xây dựng cơ sở tri thức y khoa cơ bản (mô tả triệu chứng thường gặp và chuyên khoa tương ứng), chuyển thành embedding và lưu vào Vector DB.
+- Lập trình luồng RAG hoàn chỉnh cho UC010: nhận câu hỏi của bệnh nhân → chuyển thành embedding → truy vấn Vector DB lấy tri thức liên quan → ghép ngữ cảnh với câu hỏi gốc → gửi tới LLM → trả về gợi ý chuyên khoa.
+- Thiết kế và tinh chỉnh prompt (Prompt Engineering) để chatbot xử lý đúng các tình huống: triệu chứng chưa rõ ràng (hỏi thêm), triệu chứng khẩn cấp (khuyến cáo cấp cứu ngay), không có dữ liệu liên quan (trả lời tổng quát kèm khuyến cáo).
+- Lập trình chức năng AI trợ lý bác sĩ (UC011): tổng hợp lịch sử khám của bệnh nhân, gửi tới LLM theo prompt tóm tắt y khoa, hiển thị bản tóm tắt cho bác sĩ ngay khi mở hồ sơ.
+- Lập trình chức năng AI cảnh báo tương tác thuốc: khi bác sĩ kê đơn, hệ thống đối chiếu với danh mục tương tác thuốc (UC014) và hiển thị cảnh báo mức độ nhẹ/trung bình/nghiêm trọng.
+- Xây dựng giao diện khung chat AI cho bệnh nhân và giao diện hiển thị bản tóm tắt/cảnh báo AI cho bác sĩ.
+4. Kết quả cụ thể đạt được
+- Cơ sở tri thức y khoa cơ bản đã được xây dựng và lưu trữ trong Vector DB.
+- Tính năng AI Chatbot sàng lọc triệu chứng (UC010) hoạt động đầy đủ, xử lý được các tình huống thông thường, không rõ ràng và khẩn cấp.
+- Tính năng AI trợ lý bác sĩ (UC011) hoạt động đầy đủ: tự động tóm tắt bệnh án và cảnh báo tương tác thuốc khi kê đơn.
+- 2 màn hình giao diện AI mới đã hoàn thành: khung chat AI cho bệnh nhân, khu vực hiển thị tóm tắt/cảnh báo AI cho bác sĩ.
+- Toàn bộ 14/14 Use Case trong SRS đã có chức năng tương ứng được lập trình.
+5. Số liệu tổng kết tuần
+Nội dung
+Số liệu
+
+Số tính năng AI đã tích hợp
+2/2 tính năng
+
+Tổng số Use Case đã hoàn thành (lũy kế)
+14/14 UC
+
+Số màn hình giao diện mới
+2 màn hình
+
+Tổng số màn hình (lũy kế)
+13 màn hình
+
+Số kịch bản chatbot đã thử nghiệm
+Khoảng 20 kịch bản
+
+6. Khó khăn và hướng giải quyết
+Khó khăn
+Nguyên nhân
+Cách giải quyết
+
+Chatbot đôi khi trả lời chung chung, chưa bám sát tri thức y khoa đã nạp vào Vector DB.
+Cơ sở tri thức ban đầu còn ít, prompt ghép ngữ cảnh chưa tối ưu.
+Bổ sung thêm dữ liệu tri thức y khoa và điều chỉnh lại prompt để LLM ưu tiên dùng ngữ cảnh truy xuất được trước khi dùng kiến thức tổng quát.
+
+Việc nhận diện tình huống khẩn cấp trong câu hỏi của bệnh nhân đôi khi chưa chính xác.
+Từ khóa mô tả triệu chứng khẩn cấp trong tiếng Việt khá đa dạng, khó liệt kê hết.
+Xây dựng danh sách từ khóa cảnh báo mở rộng và kiểm thử thêm nhiều kịch bản trước khi hoàn thiện ở tuần 8.
+
+7. Kế hoạch tuần tiếp theo
+- Xây dựng kịch bản kiểm thử tổng thể cho toàn bộ 14 Use Case.
+- Kiểm thử toàn hệ thống, phát hiện và khắc phục lỗi.
+- Tối ưu hiệu năng và chuẩn bị môi trường triển khai thử nghiệm.
+
