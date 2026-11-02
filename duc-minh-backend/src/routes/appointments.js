@@ -1,0 +1,262 @@
+const express = require('express');
+const { pool } = require('../db');
+const { authenticate, requireRole } = require('../middleware/auth');
+const { SPECIALTIES, APPOINTMENT_STATUSES } = require('../constants');
+const { createAppointment, updateAppointment, BookingError } = require('../lib/appointmentService');
+const { getAvailableSlots } = require('../lib/availability');
+const { logAudit } = require('../lib/audit');
+const { intParam } = require('../middleware/params');
+
+const router = express.Router();
+router.param('id', intParam);
+router.param('appointmentId', intParam);
+
+const STAFF_ROLES = ['staff', 'doctor', 'admin'];
+
+// Bác sĩ theo chuyên khoa cho trang chủ (công khai) — đặt TRƯỚC router.use(authenticate).
+router.get('/public-doctors', async (req, res) => {
+  try {
+    const { specialty } = req.query;
+    if (!specialty || !SPECIALTIES.includes(specialty)) {
+      return res.status(400).json({ error: 'Chuyên khoa không hợp lệ.' });
+    }
+    // specialty = NULL là bác sĩ tổng quát, khám được mọi chuyên khoa.
+    const result = await pool.query(
+      "SELECT id, name, phone, specialty, bio FROM users WHERE role = 'doctor' AND (specialty = $1 OR specialty IS NULL) ORDER BY specialty NULLS LAST, name",
+      [specialty]
+    );
+    res.json({ doctors: result.rows });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+router.use(authenticate);
+
+const APPT_SELECT = `
+  SELECT a.*, p.name AS patient_name, p.phone AS patient_phone, d.name AS doctor_name, d.bio AS doctor_bio,
+         (EXTRACT(DOW FROM a.appointment_date) = 0) AS is_sunday,
+         EXISTS(SELECT 1 FROM invoices i WHERE i.appointment_id = a.id) AS has_invoice
+  FROM appointments a
+  JOIN users p ON p.id = a.patient_id
+  LEFT JOIN users d ON d.id = a.doctor_id
+`;
+
+function publicAppointment(a) {
+  return {
+    id: a.id,
+    patientId: a.patient_id,
+    patientName: a.patient_name,
+    patientPhone: a.patient_phone,
+    doctorId: a.doctor_id,
+    doctorName: a.doctor_name,
+    doctorBio: a.doctor_bio,
+    specialty: a.specialty,
+    date: a.appointment_date,
+    time: a.appointment_time,
+    status: a.status,
+    isSunday: a.is_sunday,
+    note: a.note,
+    contactName: a.contact_name,
+    contactPhone: a.contact_phone,
+    age: a.age,
+    gender: a.gender,
+    discountCategory: a.discount_category,
+    hasInvoice: a.has_invoice,
+    createdAt: a.created_at,
+  };
+}
+
+// Bác sĩ (lọc theo chuyên khoa, kể cả bác sĩ tổng quát) để bệnh nhân chọn khi đặt lịch.
+router.get('/doctors', async (req, res) => {
+  try {
+    const { specialty } = req.query;
+    const params = [];
+    let sql = "SELECT id, name, specialty, bio FROM users WHERE role = 'doctor'";
+    if (specialty) {
+      params.push(specialty);
+      sql += ` AND (specialty = $${params.length} OR specialty IS NULL)`;
+    }
+    sql += ' ORDER BY name';
+    const result = await pool.query(sql, params);
+    res.json({ doctors: result.rows });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+router.post('/', async (req, res) => {
+  try {
+    const { specialty, doctorId, date, time, note, contactName, contactPhone, age, gender, discountCategory } = req.body || {};
+    const id = await createAppointment({
+      patientId: req.user.id, specialty, doctorId, date, time, note, contactName, contactPhone, age, gender, discountCategory,
+    });
+    const full = await pool.query(APPT_SELECT + ' WHERE a.id = $1', [id]);
+    res.status(201).json({ appointment: publicAppointment(full.rows[0]) });
+  } catch (e) {
+    if (e instanceof BookingError) {
+      return res.status(e.status).json({ error: e.message });
+    }
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// Khung giờ còn trống cho lưới lịch tuần ở trang đặt lịch.
+router.get('/availability', async (req, res) => {
+  try {
+    const { specialty, date, doctorId, excludeAppointmentId } = req.query;
+    if (!specialty || !SPECIALTIES.includes(specialty)) {
+      return res.status(400).json({ error: 'Chuyên khoa không hợp lệ.' });
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date))) {
+      return res.status(400).json({ error: 'Ngày không hợp lệ.' });
+    }
+    const { slots } = await getAvailableSlots({
+      specialty, date,
+      doctorId: doctorId ? Number(doctorId) : null,
+      excludeAppointmentId: excludeAppointmentId ? Number(excludeAppointmentId) : null,
+    });
+    res.json({ specialty, date, slots });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// Sửa thông tin liên hệ và/hoặc ngày giờ (quy tắc trong updateAppointment).
+router.patch('/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return res.status(404).json({ error: 'Không tìm thấy lịch hẹn.' });
+    const { doctorId, date, time, note, contactName, contactPhone, age, gender, discountCategory } = req.body || {};
+    await updateAppointment({ id, requester: req.user, doctorId, date, time, note, contactName, contactPhone, age, gender, discountCategory });
+    const full = await pool.query(APPT_SELECT + ' WHERE a.id = $1', [id]);
+    res.json({ appointment: publicAppointment(full.rows[0]) });
+  } catch (e) {
+    if (e instanceof BookingError) {
+      return res.status(e.status).json({ error: e.message });
+    }
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// Lịch hẹn của chính người đang đăng nhập.
+router.get('/mine', async (req, res) => {
+  try {
+    const result = await pool.query(
+      APPT_SELECT + ' WHERE a.patient_id = $1 ORDER BY a.appointment_date DESC, a.appointment_time DESC',
+      [req.user.id]
+    );
+    res.json({ appointments: result.rows.map(publicAppointment) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// Chi tiết 1 lịch hẹn — bệnh nhân chỉ xem của mình. Đặt SAU '/mine' và '/doctors' để khớp trước ':id'.
+router.get('/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return res.status(404).json({ error: 'Không tìm thấy lịch hẹn.' });
+    const result = await pool.query(APPT_SELECT + ' WHERE a.id = $1', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Không tìm thấy lịch hẹn.' });
+    const appt = result.rows[0];
+    if (!STAFF_ROLES.includes(req.user.role) && appt.patient_id !== req.user.id) {
+      return res.status(403).json({ error: 'Bạn không có quyền xem lịch hẹn này.' });
+    }
+    res.json({ appointment: publicAppointment(appt) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// Hàng đợi khám — chỉ Nhân viên/Bác sĩ/Admin xem được toàn bộ.
+router.get('/', requireRole(...STAFF_ROLES), async (req, res) => {
+  try {
+    const { date, status } = req.query;
+    const conditions = [];
+    const params = [];
+    if (date) { params.push(date); conditions.push(`a.appointment_date = $${params.length}`); }
+    if (status) { params.push(status); conditions.push(`a.status = $${params.length}`); }
+    const where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
+    const result = await pool.query(
+      `${APPT_SELECT} ${where} ORDER BY a.appointment_date, a.appointment_time`,
+      params
+    );
+    res.json({ appointments: result.rows.map(publicAppointment) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+router.patch('/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body || {};
+    if (!APPOINTMENT_STATUSES.includes(status)) {
+      return res.status(400).json({ error: 'Trạng thái không hợp lệ.' });
+    }
+    const id = Number(req.params.id);
+    const existing = await pool.query('SELECT * FROM appointments WHERE id = $1', [id]);
+    if (existing.rows.length === 0) {
+      return res.status(404).json({ error: 'Không tìm thấy lịch hẹn.' });
+    }
+    const appt = existing.rows[0];
+    const isStaffLike = STAFF_ROLES.includes(req.user.role);
+    const isOwner = appt.patient_id === req.user.id;
+
+    // Lịch Chủ nhật chỉ hiệu lực khi chính bác sĩ phụ trách (hoặc admin) đồng ý.
+    if (status === 'da_xac_nhan' && appt.status === 'cho_xac_nhan' && req.user.role !== 'admin' && appt.doctor_id !== req.user.id) {
+      const dow = await pool.query('SELECT EXTRACT(DOW FROM appointment_date)::int AS dow FROM appointments WHERE id = $1', [id]);
+      if (dow.rows[0].dow === 0) {
+        return res.status(403).json({ error: 'Lịch khám Chủ nhật cần chính bác sĩ phụ trách xác nhận (bác sĩ đồng ý thì mới có hiệu lực).' });
+      }
+    }
+
+    // Bác sĩ chỉ đổi trạng thái lịch của mình; lịch chưa gắn bác sĩ thì bác sĩ cùng chuyên khoa "nhận ca" bằng
+    // hành động đầu tiên. Nhân viên/admin không bị giới hạn.
+    let autoAssignDoctorId = null;
+    if (req.user.role === 'doctor') {
+      if (appt.doctor_id) {
+        if (appt.doctor_id !== req.user.id) {
+          return res.status(403).json({ error: 'Lịch hẹn này đã được chỉ định cho bác sĩ khác.' });
+        }
+      } else {
+        const me = await pool.query('SELECT specialty FROM users WHERE id = $1', [req.user.id]);
+        const mySpecialty = me.rows[0]?.specialty;
+        if (mySpecialty && mySpecialty !== appt.specialty) {
+          return res.status(403).json({ error: 'Lịch hẹn này không thuộc chuyên khoa của bạn.' });
+        }
+        autoAssignDoctorId = req.user.id;
+      }
+    }
+
+    // Bệnh nhân chỉ được tự huỷ lịch của mình.
+    if (!isStaffLike && !(isOwner && status === 'da_huy')) {
+      return res.status(403).json({ error: 'Bạn chỉ có thể huỷ lịch hẹn của chính mình.' });
+    }
+
+    const updated = autoAssignDoctorId
+      ? await pool.query('UPDATE appointments SET status = $1, doctor_id = $2 WHERE id = $3 RETURNING id', [status, autoAssignDoctorId, id])
+      : await pool.query('UPDATE appointments SET status = $1 WHERE id = $2 RETURNING id', [status, id]);
+    if (appt.status !== status) {
+      await logAudit(req.user, status === 'da_huy' ? 'appointment.cancel' : 'appointment.status', 'appointment', id, { from: appt.status, to: status, patientId: appt.patient_id });
+    }
+    const full = await pool.query(APPT_SELECT + ' WHERE a.id = $1', [updated.rows[0].id]);
+    res.json({ appointment: publicAppointment(full.rows[0]) });
+  } catch (e) {
+    if (e.code === '23505') {
+      return res.status(409).json({ error: 'Bạn đã có lịch hẹn khác trùng đúng khung giờ này.' });
+    }
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+module.exports = router;

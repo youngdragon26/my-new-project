@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: duc-minh-clinic
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_REGISTER_CODE
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      # Dùng Ollama trên laptop qua đường hầm (npm run tunnel); laptop tắt thì tự quay về Gemini.
+      - key: AI_PROVIDER
+        value: ollama
+      - key: OLLAMA_MODEL
+        value: qwen3:1.7b
+      - key: OLLAMA_API_KEY
+        sync: false

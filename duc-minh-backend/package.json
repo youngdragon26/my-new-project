@@ -1,0 +1,32 @@
+{
+  "name": "duc-minh-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "tunnel": "node scripts/ollama-tunnel.js",
+    "eval-chat": "node scripts/eval-chatbot.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@google/genai": "^2.21.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^6.10.1",
+    "pdf-parse": "^2.4.5",
+    "pg": "^8.23.0"
+  }
+}

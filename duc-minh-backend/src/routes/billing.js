@@ -1,0 +1,441 @@
+const express = require('express');
+const { pool } = require('../db');
+const { authenticate, requireAdmin, requireRole } = require('../middleware/auth');
+const { logAudit } = require('../lib/audit');
+const { SPECIALTIES, INVOICE_STATUSES, PAYMENT_METHODS, DISCOUNT_CATEGORIES, DISCOUNT_CATEGORY_LABELS } = require('../constants');
+const { intParam } = require('../middleware/params');
+
+const router = express.Router();
+router.param('id', intParam);
+router.param('appointmentId', intParam);
+router.use(authenticate);
+
+const STAFF_ROLES = ['staff', 'doctor', 'admin'];
+
+// ---------- Bảng giá dịch vụ (phí khám theo chuyên khoa) ----------
+
+router.get('/service-prices', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT specialty, price FROM service_prices');
+    const bySpecialty = Object.fromEntries(result.rows.map((r) => [r.specialty, r.price]));
+    const prices = SPECIALTIES.map((s) => ({
+      specialty: s,
+      price: Object.prototype.hasOwnProperty.call(bySpecialty, s) ? bySpecialty[s] : null,
+      configured: Object.prototype.hasOwnProperty.call(bySpecialty, s),
+    }));
+    res.json({ prices });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+router.put('/service-prices/:specialty', requireAdmin, async (req, res) => {
+  try {
+    const specialty = decodeURIComponent(req.params.specialty);
+    if (!SPECIALTIES.includes(specialty)) {
+      return res.status(400).json({ error: 'Chuyên khoa không hợp lệ.' });
+    }
+    const price = Number(req.body?.price);
+    if (!Number.isFinite(price) || price < 0) {
+      return res.status(400).json({ error: 'Giá khám không hợp lệ.' });
+    }
+    const old = await pool.query('SELECT price FROM service_prices WHERE specialty = $1', [specialty]);
+    await pool.query(
+      `INSERT INTO service_prices (specialty, price) VALUES ($1, $2)
+       ON CONFLICT (specialty) DO UPDATE SET price = EXCLUDED.price`,
+      [specialty, price]
+    );
+    await logAudit(req.user, 'price.service', 'service_price', null, { specialty, from: old.rows[0]?.price ?? null, to: price });
+    res.json({ specialty, price });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// ---------- % giảm giá theo đối tượng ưu tiên (BHYT / thẻ sinh viên) ----------
+
+router.get('/discount-rates', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT category, percent FROM discount_rates');
+    const byCategory = Object.fromEntries(result.rows.map((r) => [r.category, r.percent]));
+    const rates = DISCOUNT_CATEGORIES.map((c) => ({
+      category: c,
+      label: DISCOUNT_CATEGORY_LABELS[c],
+      percent: byCategory[c] ?? 0,
+    }));
+    res.json({ rates });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+router.put('/discount-rates/:category', requireAdmin, async (req, res) => {
+  try {
+    const category = req.params.category;
+    if (!DISCOUNT_CATEGORIES.includes(category)) {
+      return res.status(400).json({ error: 'Đối tượng ưu tiên không hợp lệ.' });
+    }
+    const percent = Number(req.body?.percent);
+    if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
+      return res.status(400).json({ error: 'Phần trăm giảm giá không hợp lệ (0-100).' });
+    }
+    const old = await pool.query('SELECT percent FROM discount_rates WHERE category = $1', [category]);
+    await pool.query(
+      `INSERT INTO discount_rates (category, percent) VALUES ($1, $2)
+       ON CONFLICT (category) DO UPDATE SET percent = EXCLUDED.percent`,
+      [category, percent]
+    );
+    await logAudit(req.user, 'price.discount', 'discount_rate', null, { category, from: old.rows[0]?.percent ?? 0, to: percent });
+    res.json({ category, percent });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// ---------- Tài khoản ngân hàng nhận thanh toán QR online (VietQR) ----------
+
+function publicBankAccount(row) {
+  if (!row) return { bankBin: null, bankName: null, accountNumber: null, accountName: null, configured: false };
+  return {
+    bankBin: row.bank_bin,
+    bankName: row.bank_name,
+    accountNumber: row.account_number,
+    accountName: row.account_name,
+    configured: Boolean(row.bank_bin && row.account_number),
+  };
+}
+
+// Ai đăng nhập cũng xem được — bệnh nhân cần để tự sinh mã QR; chỉ là số tài khoản nhận tiền.
+router.get('/bank-account', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM bank_account WHERE id = 1');
+    res.json({ bankAccount: publicBankAccount(result.rows[0]) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+router.put('/bank-account', requireAdmin, async (req, res) => {
+  try {
+    const { bankBin, bankName, accountNumber, accountName } = req.body || {};
+    if (!bankBin || !accountNumber || !accountName) {
+      return res.status(400).json({ error: 'Thiếu mã ngân hàng, số tài khoản hoặc tên chủ tài khoản.' });
+    }
+    await pool.query(
+      `INSERT INTO bank_account (id, bank_bin, bank_name, account_number, account_name, updated_at)
+       VALUES (1, $1, $2, $3, $4, now())
+       ON CONFLICT (id) DO UPDATE SET
+         bank_bin = EXCLUDED.bank_bin, bank_name = EXCLUDED.bank_name,
+         account_number = EXCLUDED.account_number, account_name = EXCLUDED.account_name, updated_at = now()`,
+      [String(bankBin).trim(), bankName ? String(bankName).trim() : null, String(accountNumber).trim(), String(accountName).trim().toUpperCase()]
+    );
+    await logAudit(req.user, 'bank_account.update', 'bank_account', null, { bankName, accountNumber });
+    const result = await pool.query('SELECT * FROM bank_account WHERE id = 1');
+    res.json({ bankAccount: publicBankAccount(result.rows[0]) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// ---------- Hoá đơn ----------
+
+// Số hoá đơn hiển thị: HD-000001 (theo id tự tăng).
+const invoiceCode = (id) => 'HD-' + String(id).padStart(6, '0');
+
+function publicInvoice(inv) {
+  return {
+    id: inv.id,
+    code: invoiceCode(inv.id),
+    appointmentId: inv.appointment_id,
+    patientId: inv.patient_id,
+    patientName: inv.patient_name,
+    patientPhone: inv.patient_phone,
+    specialty: inv.specialty,
+    date: inv.appointment_date,
+    time: inv.appointment_time,
+    // Người thực sự đi khám (có thể khác chủ tài khoản).
+    contactName: inv.contact_name,
+    contactPhone: inv.contact_phone,
+    contactAge: inv.contact_age,
+    contactGender: inv.contact_gender,
+    doctorName: inv.doctor_name,
+    diagnosis: inv.diagnosis,
+    recordCode: inv.record_id ? 'DT-' + String(inv.record_id).padStart(6, '0') : null,
+    discountCategory: inv.discount_category,
+    createdByName: inv.created_by_name,
+    totalAmount: inv.total_amount,
+    status: inv.status,
+    paymentMethod: inv.payment_method,
+    paidAt: inv.paid_at,
+    onlinePaymentClaimedAt: inv.online_payment_claimed_at,
+    createdAt: inv.created_at,
+  };
+}
+
+const INVOICE_SELECT = `
+  SELECT inv.*, p.name AS patient_name, p.phone AS patient_phone,
+         a.specialty, a.appointment_date::text AS appointment_date, a.appointment_time, a.contact_name, a.contact_phone,
+         a.age AS contact_age, a.gender AS contact_gender, a.discount_category,
+         d.name AS doctor_name, cb.name AS created_by_name, mr.id AS record_id, mr.diagnosis
+  FROM invoices inv
+  JOIN users p ON p.id = inv.patient_id
+  JOIN appointments a ON a.id = inv.appointment_id
+  LEFT JOIN users d ON d.id = a.doctor_id
+  LEFT JOIN users cb ON cb.id = inv.created_by
+  LEFT JOIN medical_records mr ON mr.appointment_id = a.id
+`;
+
+async function attachInvoiceItems(inv) {
+  const items = await pool.query(
+    'SELECT id, description, quantity, unit_price AS "unitPrice", subtotal FROM invoice_items WHERE invoice_id = $1 ORDER BY id',
+    [inv.id]
+  );
+  const rows = items.rows;
+  // Tính lại từ các dòng đã lưu (dòng đầu là phí khám, dòng âm là giảm giá) — đúng % lúc lập dù admin đổi sau đó.
+  const consultationFee = rows.length ? rows[0].subtotal : 0;
+  const discountAmount = -rows.filter((i) => i.subtotal < 0).reduce((s, i) => s + i.subtotal, 0);
+  const grossAmount = rows.filter((i) => i.subtotal > 0).reduce((s, i) => s + i.subtotal, 0);
+  const discountPercent = consultationFee > 0 && discountAmount > 0 ? Math.round((discountAmount * 1000) / consultationFee) / 10 : 0;
+  return { ...publicInvoice(inv), consultationFee, medicinesTotal: grossAmount - consultationFee, grossAmount, discountAmount, discountPercent, items: rows };
+}
+
+// Lập hoá đơn cho lịch hẹn đã khám xong: phí khám + đơn thuốc. Chỉ Nhân viên/Admin.
+router.post('/invoices', requireRole('staff', 'admin'), async (req, res) => {
+  try {
+    const appointmentId = Number(req.body?.appointmentId);
+    if (!appointmentId) return res.status(400).json({ error: 'Thiếu lịch hẹn.' });
+
+    const apptRes = await pool.query('SELECT * FROM appointments WHERE id = $1', [appointmentId]);
+    if (apptRes.rows.length === 0) return res.status(404).json({ error: 'Không tìm thấy lịch hẹn.' });
+    const appt = apptRes.rows[0];
+    if (appt.status !== 'hoan_thanh') {
+      return res.status(400).json({ error: 'Chỉ lập được hoá đơn cho lịch hẹn đã Hoàn thành khám.' });
+    }
+
+    const priceRow = await pool.query('SELECT price FROM service_prices WHERE specialty = $1', [appt.specialty]);
+    if (priceRow.rows.length === 0) {
+      return res.status(400).json({
+        error: `Chưa thiết lập giá khám cho chuyên khoa "${appt.specialty}". Vào Bảng giá dịch vụ để thiết lập trước.`,
+      });
+    }
+    const consultationFee = priceRow.rows[0].price;
+
+    // Giảm giá ưu tiên chỉ áp lên phí khám, không cộng dồn.
+    let discountAmount = 0;
+    if (appt.discount_category) {
+      const rateRow = await pool.query('SELECT percent FROM discount_rates WHERE category = $1', [appt.discount_category]);
+      const percent = rateRow.rows[0]?.percent ?? 0;
+      discountAmount = Math.round((consultationFee * percent) / 100);
+    }
+
+    const recordRes = await pool.query('SELECT id FROM medical_records WHERE appointment_id = $1', [appointmentId]);
+    let prescriptionItems = [];
+    if (recordRes.rows.length > 0) {
+      const itemsRes = await pool.query(
+        `SELECT pi.quantity, m.name, m.price FROM prescription_items pi
+         JOIN medicines m ON m.id = pi.medicine_id WHERE pi.medical_record_id = $1`,
+        [recordRes.rows[0].id]
+      );
+      prescriptionItems = itemsRes.rows;
+    }
+
+    const lineItems = [
+      { description: `Phí khám: ${appt.specialty}`, quantity: 1, unitPrice: consultationFee, subtotal: consultationFee },
+      ...(discountAmount > 0 ? [{
+        description: `Giảm giá (${DISCOUNT_CATEGORY_LABELS[appt.discount_category]})`,
+        quantity: 1, unitPrice: -discountAmount, subtotal: -discountAmount,
+      }] : []),
+      ...prescriptionItems.map((it) => ({
+        description: it.name,
+        quantity: it.quantity,
+        unitPrice: it.price,
+        subtotal: it.quantity * it.price,
+      })),
+    ];
+    const totalAmount = lineItems.reduce((sum, it) => sum + it.subtotal, 0);
+
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const invRes = await client.query(
+        `INSERT INTO invoices (appointment_id, patient_id, created_by, total_amount)
+         VALUES ($1, $2, $3, $4) RETURNING id`,
+        [appointmentId, appt.patient_id, req.user.id, totalAmount]
+      );
+      const invoiceId = invRes.rows[0].id;
+      for (const it of lineItems) {
+        await client.query(
+          'INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, subtotal) VALUES ($1,$2,$3,$4,$5)',
+          [invoiceId, it.description, it.quantity, it.unitPrice, it.subtotal]
+        );
+      }
+      await client.query('COMMIT');
+
+      const full = await pool.query(INVOICE_SELECT + ' WHERE inv.id = $1', [invoiceId]);
+      await logAudit(req.user, 'invoice.create', 'invoice', invoiceId, { appointmentId, total: full.rows[0].total_amount });
+      res.status(201).json({ invoice: await attachInvoiceItems(full.rows[0]) });
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
+  } catch (e) {
+    if (e.code === '23505') {
+      return res.status(409).json({ error: 'Lịch hẹn này đã có hoá đơn.' });
+    }
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// Bệnh nhân xem hoá đơn của mình — ghi nhật ký lượt tự truy cập.
+router.get('/invoices/mine', async (req, res) => {
+  try {
+    const result = await pool.query(INVOICE_SELECT + ' WHERE inv.patient_id = $1 ORDER BY inv.created_at DESC', [req.user.id]);
+    const invoices = await Promise.all(result.rows.map(attachInvoiceItems));
+    if (req.user.role === 'patient') {
+      await logAudit(req.user, 'invoice.self_view', 'invoice', null, { count: invoices.length });
+    }
+    res.json({ invoices });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+router.get('/invoices', requireRole(...STAFF_ROLES), async (req, res) => {
+  try {
+    const { status, date } = req.query;
+    const conditions = [];
+    const params = [];
+    if (status) { params.push(status); conditions.push(`inv.status = $${params.length}`); }
+    if (date) { params.push(date); conditions.push(`a.appointment_date = $${params.length}`); }
+    const where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
+    const result = await pool.query(`${INVOICE_SELECT} ${where} ORDER BY inv.created_at DESC`, params);
+    res.json({ invoices: await Promise.all(result.rows.map(attachInvoiceItems)) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+router.get('/invoices/by-appointment/:appointmentId', async (req, res) => {
+  try {
+    const result = await pool.query(INVOICE_SELECT + ' WHERE inv.appointment_id = $1', [Number(req.params.appointmentId)]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Chưa có hoá đơn cho lịch hẹn này.' });
+    const inv = result.rows[0];
+    if (!STAFF_ROLES.includes(req.user.role) && inv.patient_id !== req.user.id) {
+      return res.status(403).json({ error: 'Bạn không có quyền xem hoá đơn này.' });
+    }
+    if (req.user.role === 'patient') {
+      await logAudit(req.user, 'invoice.self_view', 'invoice', inv.id, { via: 'by-appointment' });
+    }
+    res.json({ invoice: await attachInvoiceItems(inv) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// Đặt SAU '/invoices/mine' và '/invoices/by-appointment/...' để 2 đường dẫn đó khớp trước ':id'.
+// Chỉ trạng thái thanh toán — trang Hồ sơ gọi 30 giây/lần nên KHÔNG ghi nhật ký.
+router.get('/invoices/:id/payment-status', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return res.status(404).json({ error: 'Không tìm thấy hoá đơn.' });
+    const result = await pool.query(
+      'SELECT patient_id, status, payment_method, paid_at, online_payment_claimed_at FROM invoices WHERE id = $1', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Không tìm thấy hoá đơn.' });
+    const inv = result.rows[0];
+    if (!STAFF_ROLES.includes(req.user.role) && inv.patient_id !== req.user.id) {
+      return res.status(403).json({ error: 'Bạn không có quyền xem hoá đơn này.' });
+    }
+    res.json({
+      status: inv.status,
+      paymentMethod: inv.payment_method,
+      paidAt: inv.paid_at,
+      onlinePaymentClaimedAt: inv.online_payment_claimed_at,
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+router.get('/invoices/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id)) return res.status(404).json({ error: 'Không tìm thấy hoá đơn.' });
+    const result = await pool.query(INVOICE_SELECT + ' WHERE inv.id = $1', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Không tìm thấy hoá đơn.' });
+    const inv = result.rows[0];
+    if (!STAFF_ROLES.includes(req.user.role) && inv.patient_id !== req.user.id) {
+      return res.status(403).json({ error: 'Bạn không có quyền xem hoá đơn này.' });
+    }
+    if (req.user.role === 'patient') {
+      await logAudit(req.user, 'invoice.self_view', 'invoice', inv.id, { via: 'by-id' });
+    }
+    res.json({ invoice: await attachInvoiceItems(inv) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+router.patch('/invoices/:id/status', requireRole('staff', 'admin'), async (req, res) => {
+  try {
+    const { status, paymentMethod } = req.body || {};
+    if (!INVOICE_STATUSES.includes(status)) return res.status(400).json({ error: 'Trạng thái không hợp lệ.' });
+    // "Đã thanh toán" phải kèm hình thức thanh toán; huỷ đánh dấu thì xoá đi.
+    if (status === 'da_thanh_toan' && !PAYMENT_METHODS.includes(paymentMethod)) {
+      return res.status(400).json({ error: 'Vui lòng chọn hình thức thanh toán (tiền mặt hoặc chuyển khoản).' });
+    }
+    const result = await pool.query(
+      `UPDATE invoices SET status = $1, paid_at = CASE WHEN $1 = 'da_thanh_toan' THEN now() ELSE NULL END,
+              payment_method = CASE WHEN $1 = 'da_thanh_toan' THEN $3 ELSE NULL END,
+              online_payment_claimed_at = NULL
+       WHERE id = $2 RETURNING id`,
+      [status, Number(req.params.id), status === 'da_thanh_toan' ? paymentMethod : null]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Không tìm thấy hoá đơn.' });
+    const full = await pool.query(INVOICE_SELECT + ' WHERE inv.id = $1', [result.rows[0].id]);
+    await logAudit(req.user, status === 'da_thanh_toan' ? 'invoice.paid' : 'invoice.unpaid', 'invoice', result.rows[0].id,
+      { total: full.rows[0].total_amount, paymentMethod: status === 'da_thanh_toan' ? paymentMethod : null });
+    res.json({ invoice: await attachInvoiceItems(full.rows[0]) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+// Bệnh nhân báo đã chuyển khoản — chỉ đánh dấu cần nhân viên đối chiếu, chưa xác nhận đã thu.
+router.patch('/invoices/:id/claim-online-payment', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const result = await pool.query('SELECT patient_id, status FROM invoices WHERE id = $1', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Không tìm thấy hoá đơn.' });
+    const inv = result.rows[0];
+    if (inv.patient_id !== req.user.id) {
+      return res.status(403).json({ error: 'Bạn không có quyền thao tác trên hoá đơn này.' });
+    }
+    if (inv.status !== 'chua_thanh_toan') {
+      return res.status(400).json({ error: 'Hoá đơn này đã được xử lý.' });
+    }
+    await pool.query('UPDATE invoices SET online_payment_claimed_at = now() WHERE id = $1', [id]);
+    await logAudit(req.user, 'invoice.online_payment_claimed', 'invoice', id, {});
+    const full = await pool.query(INVOICE_SELECT + ' WHERE inv.id = $1', [id]);
+    res.json({ invoice: await attachInvoiceItems(full.rows[0]) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Có lỗi máy chủ, thử lại sau.' });
+  }
+});
+
+module.exports = router;

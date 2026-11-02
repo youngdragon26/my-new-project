@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hồ sơ khám bệnh — Đa Khoa Đức Minh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;1,600&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --ground:#f7f4ee; --surface:#fff; --surface-2:#f1ede3; --ink:#142e29; --ink-muted:#52685f;
+    --line:#dfdacc; --accent:#0e8e7d; --accent-deep:#0b6f62;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0e1f1c; --surface:#142e29; --surface-2:#193732; --ink:#ecece2; --ink-muted:#9fb4ac;
+      --line:#26443d; --accent:#38c8b1; --accent-deep:#2ba892;
+    }
+  }
+  *{box-sizing:border-box;}
+  html{color-scheme:light dark;}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:"Be Vietnam Pro",-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{border-bottom:1px solid var(--line);}
+  header .bar{max-width:680px; margin:0 auto; padding:16px 20px; display:flex; align-items:center; justify-content:space-between;}
+  .brand{font-family:"Lora",serif; font-weight:600; font-size:1.6rem; text-decoration:none; color:var(--ink);}
+  .brand em{color:var(--accent-deep); font-style:normal;}
+  .back{font-size:.82rem; text-decoration:none; color:var(--ink-muted);}
+  .back:hover{color:var(--ink);}
+
+  .wrap{max-width:680px; margin:0 auto; padding:32px 20px 48px;}
+  h1{font-family:"Lora",serif; font-size:1.4rem; margin:0 0 4px;}
+  .sub{color:var(--ink-muted); font-size:.88rem; margin-bottom:24px; line-height:1.6;}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:3px; padding:20px 22px; margin-bottom:16px;}
+  .record-head{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
+  .record-head b{font-family:"Lora",serif; font-size:1.02rem;}
+  .record-head span{font-size:.8rem; color:var(--ink-muted);}
+  .field{margin-top:8px; font-size:.88rem; line-height:1.55;}
+  .field b{color:var(--ink-muted); font-weight:600; font-size:.76rem; text-transform:uppercase; letter-spacing:.03em; display:block; margin-bottom:2px;}
+  ul.rx{margin:4px 0 0; padding-left:18px; font-size:.86rem; line-height:1.7;}
+  .empty{color:var(--ink-muted); font-size:.9rem;}
+  .pill{padding:2px 9px; border-radius:20px; font-size:.72rem; font-weight:600; white-space:nowrap; display:inline-block;}
+  .pill.chua_thanh_toan{background:#fdf0d0; color:#8a5a00;}
+  .pill.da_thanh_toan{background:#d7f0ea; color:var(--accent-deep);}
+  .money{font-variant-numeric:tabular-nums; font-weight:600;}
+  [hidden]{display:none !important;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <a href="/" class="brand">Đa Khoa <em>Đức Minh</em></a>
+    <a href="/khong-gian.html" class="back" style="margin-right:14px;">Không gian của tôi</a>
+    <a href="/dat-lich.html" class="back">← Đặt lịch khám</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1>Hồ sơ khám bệnh</h1>
+  <p class="sub">Lịch sử khám và đơn thuốc đã được bác sĩ kê cho bạn.</p>
+
+  <div class="card" id="needLoginCard" hidden>
+    <p style="margin:0 0 12px;">Bạn cần đăng nhập để xem hồ sơ khám bệnh.</p>
+    <a href="/tai-khoan.html" class="back" style="text-decoration:underline;">Đăng nhập / Đăng ký →</a>
+  </div>
+
+  <div id="list"></div>
+  <div class="card empty" id="emptyCard" hidden>Bạn chưa có hồ sơ khám bệnh nào.</div>
+</div>
+
+<script src="/invoice-sheet.js"></script>
+<script>
+  const API = '';
+  // Tên trong CSDL có thể đã kèm 'BS.' — tránh hiện 'BS. BS. …'.
+  const drName = (n) => (/^BS\.?\s/i.test(n || '') ? n : 'BS. ' + (n || ''));
+  function esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  const token = localStorage.getItem('dm_token');
+
+  const STATUS_LABELS = { chua_thanh_toan: 'Chưa thanh toán', da_thanh_toan: 'Đã thanh toán' };
+  const PAYMENT_METHOD_LABELS = { tien_mat: 'Tiền mặt', chuyen_khoan: 'Chuyển khoản' };
+  function money(n) { return Number(n).toLocaleString('vi-VN') + 'đ'; }
+
+  async function api(path, opts = {}) {
+    const res = await fetch(API + path, {
+      ...opts,
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(opts.headers || {}) },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ('Lỗi ' + res.status));
+    return data;
+  }
+
+  // Thông tin nhận thanh toán lấy 1 lần cho cả trang.
+  let bankAccountPromise = null;
+  function getBankAccount() {
+    if (!bankAccountPromise) {
+      bankAccountPromise = api('/api/billing/bank-account').then(r => r.bankAccount).catch(() => ({ configured: false }));
+    }
+    return bankAccountPromise;
+  }
+
+  const invoiceById = {}; // hoá đơn đã tải, để mở lại xem chi tiết không cần gọi API lần nữa
+
+  async function invoiceHtml(appointmentId) {
+    try {
+      const { invoice } = await api('/api/billing/invoices/by-appointment/' + appointmentId);
+      const methodPart = invoice.paymentMethod ? ` · ${PAYMENT_METHOD_LABELS[invoice.paymentMethod]}` : '';
+      invoiceById[invoice.id] = invoice;
+      const base = `<div class="field"><b>Hoá đơn ${invoice.code}</b><span class="money">${money(invoice.totalAmount)}</span> · <span class="pill ${invoice.status}">${STATUS_LABELS[invoice.status]}</span>${methodPart} · <button type="button" class="view-invoice" data-invoice-id="${invoice.id}" style="font:inherit; font-size:.85rem; font-weight:600; color:var(--accent-deep); background:none; border:0; padding:0; cursor:pointer; text-decoration:underline;">👁 Xem chi tiết</button> · <a href="/in.html?type=hd&id=${invoice.id}" target="_blank">🖨 In hoá đơn</a></div>`;
+
+      if (invoice.status !== 'chua_thanh_toan') return base;
+
+      const bank = await getBankAccount();
+      // Chưa có tài khoản nhận tiền thì báo rõ thay vì ẩn phần thanh toán.
+      if (!bank.configured) {
+        return base + `<div class="field"><b>Thanh toán</b>Phòng khám chưa mở thanh toán chuyển khoản QR online. Bạn vui lòng thanh toán tại quầy thu ngân hoặc gọi hotline 0974 755 333.</div>`;
+      }
+
+      const addInfo = encodeURIComponent((invoice.code + ' ' + (invoice.patientName || '')).trim());
+      const accountName = encodeURIComponent(bank.accountName || '');
+      const qrUrl = `https://img.vietqr.io/image/${bank.bankBin}-${bank.accountNumber}-compact2.png?amount=${invoice.totalAmount}&addInfo=${addInfo}&accountName=${accountName}`;
+      // Đã báo chuyển khoản: giữ mã QR, thay nút bằng khung tự kiểm tra (watchPayment).
+      const action = invoice.onlinePaymentClaimedAt
+        ? `<div class="pay-watch" data-invoice-id="${invoice.id}" style="margin-top:8px; padding:9px 12px; border-radius:3px; border:1px solid var(--line); font-size:.85rem;">
+             Bạn đã báo chuyển khoản lúc ${new Date(invoice.onlinePaymentClaimedAt).toLocaleString('vi-VN')}. Đang chờ xác nhận…
+           </div>`
+        : `<button type="button" class="claim-online-paid" data-invoice-id="${invoice.id}"
+             style="margin-top:8px; padding:7px 12px; border-radius:3px; border:1px solid var(--line); background:transparent; cursor:pointer; font-size:.82rem; color:var(--ink); font-family:inherit;">
+             Tôi đã chuyển khoản
+           </button>`;
+      return base + `
+        <div class="field">
+          <b>Thanh toán QR online</b>
+          <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; margin-top:4px;">
+            <img src="${qrUrl}" alt="Mã QR chuyển khoản" width="160" height="160" style="border-radius:3px; border:1px solid var(--line);">
+            <div style="flex:1; min-width:180px;">
+              <div>Quét mã bằng app ngân hàng/Ví điện tử để chuyển khoản đúng số tiền ${money(invoice.totalAmount)}. Nội dung chuyển khoản đã điền sẵn mã hoá đơn.</div>
+              ${action}
+            </div>
+          </div>
+        </div>`;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  // Hỏi lại trạng thái: 3 lần đầu cách 5 giây, sau đó 30 giây/lần, dừng sau ~10 phút.
+  // Lần 3 vẫn chưa xác nhận thì nhắc gọi nhân viên nhưng vẫn kiểm tra tiếp.
+  const QUICK_CHECKS = 3;
+  const QUICK_S = 5;
+  const SLOW_S = 30;
+  const MAX_CHECKS = QUICK_CHECKS + 20;
+  const HOTLINE = '0974 755 333';
+
+  const hotlineLink = `<a href="tel:${HOTLINE.replace(/\s/g, '')}">${HOTLINE}</a>`;
+
+  function showPaid(box, paidAt) {
+    box.innerHTML = `✅ <strong>Chuyển khoản thành công.</strong> Phòng khám đã nhận được tiền và xác nhận thanh toán lúc ${new Date(paidAt).toLocaleString('vi-VN')}.`;
+    box.closest('.card').querySelectorAll('.pill.chua_thanh_toan').forEach((p) => {
+      p.className = 'pill da_thanh_toan';
+      p.textContent = STATUS_LABELS.da_thanh_toan;
+    });
+  }
+
+  function watchPayment(box) {
+    const id = box.dataset.invoiceId;
+    let checks = 0;
+    const nextDelay = () => (checks < QUICK_CHECKS ? QUICK_S : SLOW_S);
+    let left = nextDelay();
+    let timer = null;
+    let busy = false;
+    let done = false;
+    const recheckBtn = `<button type="button" class="pay-recheck" style="margin-top:6px; padding:5px 10px; border-radius:3px; border:1px solid var(--line); background:transparent; cursor:pointer; font-size:.8rem; color:var(--ink); font-family:inherit;">Kiểm tra lại ngay</button>`;
+    const callStaff = `<strong>Đã kiểm tra ${QUICK_CHECKS} lần nhưng phòng khám chưa nhận được tiền.</strong> Vui lòng gọi nhân viên hỗ trợ qua số ${hotlineLink} để kiểm tra lại thông tin chuyển khoản (nhớ đọc mã hoá đơn).`;
+
+    function render() {
+      if (checks < QUICK_CHECKS) {
+        const notYet = checks === 0 ? '' :
+          `<div style="margin-top:6px; color:var(--accent-deep);">Lần kiểm tra ${checks}/${QUICK_CHECKS}: chưa nhận được tiền — ngân hàng có thể chuyển chậm, bạn vui lòng tiếp tục giữ máy.</div>`;
+        box.innerHTML = `⏳ <strong>Vui lòng giữ máy, chờ xác nhận.</strong> Phòng khám đang kiểm tra khoản chuyển của bạn — không cần tải lại hay đóng trang, hệ thống tự kiểm tra lại sau <strong>${left}s</strong>.${notYet}`;
+      } else {
+        box.innerHTML = `${callStaff}<div style="margin-top:6px;">Hệ thống vẫn tự kiểm tra lại sau <strong>${left}s</strong> — khi nhân viên xác nhận đã nhận tiền, trang sẽ báo thành công.</div>${recheckBtn}`;
+      }
+    }
+    function stop() {
+      clearInterval(timer);
+      done = true;
+    }
+    async function check() {
+      if (busy || done) return;
+      busy = true;
+      checks++;
+      left = nextDelay();
+      try {
+        const s = await api('/api/billing/invoices/' + id + '/payment-status');
+        if (s.status === 'da_thanh_toan') { stop(); showPaid(box, s.paidAt); return; }
+      } catch (e) { /* lỗi mạng tạm thời — lượt sau thử lại */ }
+      finally { busy = false; }
+      if (checks >= MAX_CHECKS) {
+        stop();
+        box.innerHTML = `${callStaff}<div style="margin-top:6px;">Đã dừng tự kiểm tra — bấm nút dưới đây sau khi nhân viên báo đã xác nhận.</div>${recheckBtn}`;
+        return;
+      }
+      render();
+    }
+    function start() {
+      clearInterval(timer);
+      done = false;
+      left = nextDelay();
+      render();
+      timer = setInterval(() => { left--; if (left <= 0) check(); else render(); }, 1000);
+    }
+    box.addEventListener('click', async (e) => {
+      if (!e.target.closest('.pay-recheck')) return;
+      if (done) { checks = 0; start(); }
+      await check();
+    });
+    start();
+  }
+
+  (async function init() {
+    if (!token) { document.getElementById('needLoginCard').hidden = false; return; }
+    let records;
+    try {
+      records = (await api('/api/clinical/records/mine')).records;
+    } catch (e) {
+      document.getElementById('needLoginCard').hidden = false;
+      return;
+    }
+
+    const list = document.getElementById('list');
+    if (records.length === 0) {
+      document.getElementById('emptyCard').hidden = false;
+      return;
+    }
+
+    const cards = await Promise.all(records.map(async (r) => `
+      <div class="card">
+        <div class="record-head">
+          <b>${r.specialty}</b>
+          <span>${new Date(r.date).toLocaleDateString('vi-VN')} · ${esc(drName(r.doctorName))}</span>
+        </div>
+        ${r.symptoms ? `<div class="field"><b>Triệu chứng</b>${esc(r.symptoms)}</div>` : ''}
+        <div class="field"><b>Chẩn đoán</b>${esc(r.diagnosis)}</div>
+        ${r.notes ? `<div class="field"><b>Ghi chú</b>${esc(r.notes)}</div>` : ''}
+        <div class="field">
+          <b>Đơn thuốc ${r.code} · <a href="/in.html?type=dt&id=${r.id}" target="_blank" style="font-weight:500;">🖨 In đơn thuốc</a></b>
+          ${r.items.length
+            ? `<ul class="rx">${r.items.map(it => `<li>${esc(it.medicineName)} — ${esc(it.dosage)} (SL: ${it.quantity} ${esc(it.unit)})</li>`).join('')}</ul>`
+            : 'Không kê đơn thuốc.'}
+        </div>
+        ${await invoiceHtml(r.appointmentId)}
+      </div>
+    `));
+    list.innerHTML = cards.join('');
+    list.querySelectorAll('.pay-watch').forEach(watchPayment);
+
+    list.addEventListener('click', async (e) => {
+      const viewBtn = e.target.closest('.view-invoice');
+      if (viewBtn) { window.InvoiceSheet.open(invoiceById[viewBtn.dataset.invoiceId]); return; }
+      const btn = e.target.closest('.claim-online-paid');
+      if (!btn) return;
+      const id = btn.dataset.invoiceId;
+      btn.disabled = true;
+      btn.textContent = 'Đang xử lý...';
+      const box = document.createElement('div');
+      box.className = 'pay-watch';
+      box.dataset.invoiceId = id;
+      box.style.cssText = 'margin-top:8px; padding:9px 12px; border-radius:3px; border:1px solid var(--line); font-size:.85rem;';
+      try {
+        await api('/api/billing/invoices/' + id + '/claim-online-payment', { method: 'PATCH' });
+        btn.replaceWith(box);
+        watchPayment(box);
+      } catch (err) {
+        // Nhân viên có thể đã xác nhận ngay trước khi bệnh nhân bấm — báo thành công luôn.
+        const s = await api('/api/billing/invoices/' + id + '/payment-status').catch(() => null);
+        if (s && s.status === 'da_thanh_toan') {
+          btn.replaceWith(box);
+          showPaid(box, s.paidAt);
+          return;
+        }
+        alert(err.message);
+        btn.disabled = false;
+        btn.textContent = 'Tôi đã chuyển khoản';
+      }
+    });
+  })();
+</script>
+<script src="/float-contact.js" data-zalo="0974755333"></script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hàng đợi khám — Đa Khoa Đức Minh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;1,600&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --ground:#f7f4ee; --surface:#fff; --surface-2:#f1ede3; --ink:#142e29; --ink-muted:#52685f;
+    --line:#dfdacc; --accent:#0e8e7d; --accent-deep:#0b6f62; --err:#b3261e;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0e1f1c; --surface:#142e29; --surface-2:#193732; --ink:#ecece2; --ink-muted:#9fb4ac;
+      --line:#26443d; --accent:#38c8b1; --accent-deep:#2ba892; --err:#ff8a80;
+    }
+  }
+  *{box-sizing:border-box;}
+  html{color-scheme:light dark;}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:"Be Vietnam Pro",-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{border-bottom:1px solid var(--line);}
+  header .bar{max-width:960px; margin:0 auto; padding:16px 20px; display:flex; align-items:center; justify-content:space-between;}
+  .brand{font-family:"Lora",serif; font-weight:600; font-size:1.6rem; text-decoration:none; color:var(--ink);}
+  .brand em{color:var(--accent-deep); font-style:normal;}
+  .back{font-size:.82rem; text-decoration:none; color:var(--ink-muted);}
+  .back:hover{color:var(--ink);}
+
+  .wrap{max-width:960px; margin:0 auto; padding:32px 20px 48px;}
+  h1{font-family:"Lora",serif; font-size:1.4rem; margin:0 0 4px;}
+  .sub{color:var(--ink-muted); font-size:.88rem; margin-bottom:24px; line-height:1.6;}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:3px; padding:22px; margin-bottom:20px;}
+  .filters{display:flex; gap:12px; flex-wrap:wrap; align-items:end; margin-bottom:16px;}
+  .filters div{display:flex; flex-direction:column; gap:4px;}
+  label{font-size:.78rem; color:var(--ink-muted);}
+  input, select{padding:9px 11px; border:1px solid var(--line); border-radius:3px; font-size:.88rem; background:var(--ground); color:var(--ink); font-family:inherit;}
+  input:focus, select:focus{outline:2px solid var(--accent); outline-offset:1px;}
+  button.ghost{padding:8px 13px; border-radius:3px; border:1px solid var(--line); background:transparent; cursor:pointer; font-size:.82rem; color:var(--ink); font-family:inherit;}
+  button.ghost:hover{border-color:var(--accent);}
+  table{width:100%; border-collapse:collapse; font-size:.85rem;}
+  th, td{text-align:left; padding:9px 8px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{color:var(--ink-muted); font-weight:600; font-size:.7rem; text-transform:uppercase; letter-spacing:.04em;}
+  .table-scroll{overflow-x:auto;}
+  .pill{padding:2px 9px; border-radius:20px; font-size:.72rem; font-weight:600; white-space:nowrap; display:inline-block;}
+  .pill.cho_xac_nhan{background:#fdf0d0; color:#8a5a00;}
+  .pill.da_xac_nhan{background:#d7e9ff; color:#1d4ed8;}
+  .pill.da_checkin{background:#e6dcff; color:#5b21b6;}
+  .pill.dang_kham{background:#dff5e0; color:#166534;}
+  .pill.hoan_thanh{background:#d7f0ea; color:var(--accent-deep);}
+  .pill.da_huy{background:#f3d9d6; color:#8f2c22;}
+  .row-actions{display:flex; gap:6px; flex-wrap:wrap;}
+  .role-select{padding:5px 8px; font-size:.78rem; border-radius:3px;}
+  .empty{color:var(--ink-muted); font-size:.86rem; padding:8px 0;}
+  .muted{color:var(--ink-muted);}
+  [hidden]{display:none !important;}
+  tr.clickable-row{cursor:pointer;}
+
+  .modal-overlay{position:fixed; inset:0; background:rgba(20,46,41,.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:100;}
+  .modal-box{background:var(--surface); border-radius:3px; padding:20px 22px; max-width:460px; width:100%; max-height:82vh; overflow:auto;}
+  .modal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;}
+  .modal-head b{font-family:"Lora",serif; font-size:1.05rem;}
+  .modal-box .field{margin-top:8px; font-size:.88rem; line-height:1.5;}
+  .modal-box .field b{display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-muted); margin-bottom:2px; font-weight:600;}
+  button.icon-btn{padding:6px 10px; border-radius:3px; border:1px solid var(--line); background:var(--surface); cursor:pointer; font-size:.85rem; color:var(--ink); font-family:inherit; line-height:1;}
+  button.icon-btn:hover{border-color:var(--accent);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <a href="/" class="brand">Đa Khoa <em>Đức Minh</em></a>
+    <a href="/khong-gian.html" class="back" style="margin-right:14px;">Không gian của tôi</a>
+    <a href="/" class="back">← Về trang chủ</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1>Hàng đợi khám</h1>
+  <p class="sub">Dành cho Nhân viên / Bác sĩ / Quản trị viên — xem lịch hẹn theo ngày và cập nhật trạng thái.</p>
+
+  <div class="card" id="noAccessCard" hidden>
+    <p style="margin:0;">Bạn không có quyền truy cập trang này (chỉ dành cho Nhân viên, Bác sĩ, Quản trị viên).</p>
+  </div>
+
+  <div id="queueArea" hidden>
+    <div class="card">
+      <div class="filters">
+        <div>
+          <label>Ngày</label>
+          <input type="date" id="fDate">
+        </div>
+        <div>
+          <label>Trạng thái</label>
+          <select id="fStatus">
+            <option value="">Tất cả</option>
+            <option value="cho_xac_nhan">Chờ xác nhận</option>
+            <option value="da_xac_nhan">Đã xác nhận</option>
+            <option value="da_checkin">Đã check-in</option>
+            <option value="dang_kham">Đang khám</option>
+            <option value="hoan_thanh">Hoàn thành</option>
+            <option value="da_huy">Đã huỷ</option>
+          </select>
+        </div>
+        <button class="ghost" id="refreshBtn">Làm mới</button>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Giờ</th><th>Bệnh nhân</th><th>SĐT</th><th>Chuyên khoa</th><th>Bác sĩ</th><th>Trạng thái</th><th>Ghi chú</th><th></th></tr></thead>
+          <tbody id="queueBody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="queueEmpty" hidden>Không có lịch hẹn nào khớp bộ lọc.</div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" hidden>
+  <div class="modal-box">
+    <div class="modal-head"><b>Chi tiết lịch hẹn</b><button type="button" class="icon-btn" id="modalClose">✕</button></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+  const API = '';
+  const token = localStorage.getItem('dm_token');
+
+  const STATUS_LABELS = {
+    cho_xac_nhan: 'Chờ xác nhận', da_xac_nhan: 'Đã xác nhận', da_checkin: 'Đã check-in',
+    dang_kham: 'Đang khám', hoan_thanh: 'Hoàn thành', da_huy: 'Đã huỷ',
+  };
+  const GENDER_LABELS = { nam: 'Nam', nu: 'Nữ', khac: 'Khác' };
+
+  // Tên bác sĩ có thể đã kèm 'BS.' sẵn trong CSDL — chỉ thêm khi chưa có, tránh hiện 'BS. BS. …'.
+  const drName = (n) => (/^BS\.?\s/i.test(n || '') ? n : 'BS. ' + (n || ''));
+  function esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function openModal(bodyHtml) {
+    document.getElementById('modalBody').innerHTML = bodyHtml;
+    document.getElementById('modalOverlay').hidden = false;
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').hidden = true;
+  }
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'modalOverlay') closeModal();
+  });
+
+  function showApptDetail(a) {
+    const genderLabel = GENDER_LABELS[a.gender] || '—';
+    openModal(`
+      <div class="field"><b>Ngày giờ</b>${a.date.slice(0, 10)} lúc ${a.time}</div>
+      <div class="field"><b>Chuyên khoa</b>${esc(a.specialty)}</div>
+      <div class="field"><b>Trạng thái</b><span class="pill ${a.status}">${STATUS_LABELS[a.status] || a.status}</span></div>
+      <div class="field"><b>Tài khoản đặt lịch</b>${esc(a.patientName)}${a.patientPhone ? ' · ' + esc(a.patientPhone) : ''}</div>
+      <div class="field"><b>Người khám</b>${a.contactName ? esc(a.contactName) : '—'} · ${genderLabel}${a.age != null ? ', ' + a.age + ' tuổi' : ''}</div>
+      <div class="field"><b>Số điện thoại người khám</b>${a.contactPhone ? esc(a.contactPhone) : '—'}</div>
+      ${a.note ? `<div class="field"><b>Lý do khám</b>${esc(a.note)}</div>` : ''}
+      <div class="field"><b>Bác sĩ</b>${a.doctorName ? esc(a.doctorName) : 'Chưa chỉ định'}</div>
+      ${a.doctorBio ? `<div class="field"><b>Lý lịch bác sĩ</b>${esc(a.doctorBio).replace(/\n/g, '<br>')}</div>` : ''}
+    `);
+  }
+
+  async function api(path, opts = {}) {
+    const res = await fetch(API + path, {
+      ...opts,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: 'Bearer ' + token } : {}),
+        ...(opts.headers || {}),
+      },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ('Lỗi ' + res.status));
+    return data;
+  }
+
+  const fDate = document.getElementById('fDate');
+  const fStatus = document.getElementById('fStatus');
+  fDate.value = new Date().toISOString().slice(0, 10);
+  let myRole = null;
+  let myId = null;
+  let mySpecialty = null;
+
+  // Bác sĩ chỉ được đổi trạng thái lịch hẹn đã chỉ định cho chính mình, hoặc
+  // lịch chưa chỉ định bác sĩ nhưng cùng chuyên khoa (bác sĩ tổng quát —
+  // specialty null — nhận được mọi chuyên khoa). Nhân viên/admin không giới hạn.
+  // Khớp đúng logic phân quyền phía server ở PATCH /api/appointments/:id/status.
+  function canAct(a) {
+    if (myRole !== 'doctor') return true;
+    if (a.doctorId) return a.doctorId === myId;
+    return !mySpecialty || mySpecialty === a.specialty;
+  }
+
+  async function loadQueue() {
+    const params = new URLSearchParams();
+    if (fDate.value) params.set('date', fDate.value);
+    if (fStatus.value) params.set('status', fStatus.value);
+    const { appointments } = await api('/api/appointments?' + params.toString());
+    const body = document.getElementById('queueBody');
+    const empty = document.getElementById('queueEmpty');
+    empty.hidden = appointments.length > 0;
+
+    body.innerHTML = appointments.map(a => `
+      <tr class="clickable-row" data-id="${a.id}">
+        <td>${a.time}${a.isSunday ? '<br><span class="pill" style="background:#e9d7ff; color:#5b21b6;">Chủ nhật</span>' : ''}</td>
+        <td>${esc(a.patientName)}</td>
+        <td>${a.patientPhone ? esc(a.patientPhone) : '—'}</td>
+        <td>${esc(a.specialty)}</td>
+        <td>${a.doctorName ? esc(a.doctorName) : '<span class="muted">Chưa chỉ định</span>'}</td>
+        <td><span class="pill ${a.status}">${STATUS_LABELS[a.status] || a.status}</span></td>
+        <td class="muted">${a.note ? esc(a.note) : '—'}</td>
+        <td>
+          <div class="row-actions">
+            ${canAct(a) ? `
+              <select class="role-select status-select" data-id="${a.id}">
+                ${Object.keys(STATUS_LABELS).map(s => `<option value="${s}" ${s === a.status ? 'selected' : ''}>${STATUS_LABELS[s]}</option>`).join('')}
+              </select>
+              ${a.isSunday && a.status === 'cho_xac_nhan' ? '<span class="muted" style="font-size:.72rem;">Cần bác sĩ phụ trách xác nhận</span>' : ''}
+              ${!a.doctorId && myRole === 'doctor' ? '<span class="muted" style="font-size:.72rem;">Chọn trạng thái để nhận ca</span>' : ''}
+            ` : `<span class="muted" style="font-size:.78rem;">Đã chỉ định ${esc(drName(a.doctorName))}</span>`}
+            ${myRole === 'doctor' && a.status !== 'da_huy' && canAct(a) ? `<a class="ghost" style="text-decoration:none; display:inline-block;" href="/kham-benh.html?appointmentId=${a.id}">Khám →</a>` : ''}
+          </div>
+        </td>
+      </tr>
+    `).join('');
+
+    body.querySelectorAll('tr[data-id]').forEach(tr => {
+      tr.addEventListener('click', (e) => {
+        if (e.target.closest('select') || e.target.closest('a') || e.target.closest('button')) return;
+        const appt = appointments.find(a => String(a.id) === tr.dataset.id);
+        if (appt) showApptDetail(appt);
+      });
+    });
+    body.querySelectorAll('.status-select').forEach(sel => {
+      sel.addEventListener('change', async () => {
+        try {
+          await api(`/api/appointments/${sel.dataset.id}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: sel.value }),
+          });
+          loadQueue();
+        } catch (e) {
+          alert(e.message);
+          loadQueue();
+        }
+      });
+    });
+  }
+
+  fDate.addEventListener('change', loadQueue);
+  fStatus.addEventListener('change', loadQueue);
+  document.getElementById('refreshBtn').addEventListener('click', loadQueue);
+
+  (async function init() {
+    if (!token) {
+      document.getElementById('noAccessCard').hidden = false;
+      return;
+    }
+    try {
+      const { user } = await api('/api/auth/me');
+      if (!['staff', 'doctor', 'admin'].includes(user.role)) {
+        document.getElementById('noAccessCard').hidden = false;
+        return;
+      }
+      myRole = user.role;
+      myId = user.id;
+      mySpecialty = user.specialty || null;
+    } catch (e) {
+      document.getElementById('noAccessCard').hidden = false;
+      return;
+    }
+    document.getElementById('queueArea').hidden = false;
+    await loadQueue();
+  })();
+</script>
+</body>
+</html>
