@@ -39,6 +39,8 @@ const {
   detectDoseQuestion,
   detectDoseTimingQuestion,
   detectFirstAid,
+  detectContagionQuestion,
+  detectContactRequest,
   detectOwnDataQuestion,
   detectPrivacyRequest,
   detectInsult,
@@ -223,6 +225,13 @@ async function ownDataReply(kind, msg, user, todayVN) {
     const rows = (await runTool('my_records', {}, user)).records || [];
     await logAudit(user, 'record.self_view', 'medical_record', null, { count: rows.length, via: 'ai_chat' });
     if (!rows.length) return 'Bạn chưa có hồ sơ khám nào trên hệ thống — hồ sơ và đơn thuốc chỉ có sau khi bác sĩ khám và ghi lại. Bạn xem lại ở trang Hồ sơ khám (/ho-so.html).';
+    const named = /lần nào|bao giờ|mấy lần/.test(lower) && detectSpecialty(msg);
+    if (named) {
+      const seen = rows.filter((r) => r.chuyenKhoa === named.specialty);
+      return seen.length
+        ? `Theo hồ sơ, bạn đã khám chuyên khoa ${named.specialty} ${seen.length} lần, gần nhất ngày ${dmy(seen[0].ngay)}. Bạn xem chi tiết ở trang Hồ sơ khám (/ho-so.html).`
+        : `Theo hồ sơ, bạn chưa khám chuyên khoa ${named.specialty} lần nào tại phòng khám.`;
+    }
     if (/(?:những|các) khoa|khoa nào/.test(lower)) {
       return `Theo hồ sơ khám, bạn đã khám: ${[...new Set(rows.map((r) => r.chuyenKhoa))].join(', ')}. Bạn xem chi tiết từng lần khám ở trang Hồ sơ khám (/ho-so.html).`;
     }
@@ -256,6 +265,7 @@ const FACILITY_REPLIES = {
   contact: 'Bạn liên hệ phòng khám qua hotline 0974 755 333, hoặc nhắn Zalo cùng số 0974 755 333 (nút Zalo ở góc phải màn hình). Mình chưa có thông tin về email hay fanpage chính thức.',
   payment: 'Phòng khám nhận thanh toán bằng tiền mặt tại quầy hoặc chuyển khoản (quét mã QR ở trang Hồ sơ khám /ho-so.html sau khi đăng nhập). Các hình thức khác như quẹt thẻ hay ví điện tử mình chưa có thông tin chính xác — bạn gọi hotline 0974 755 333 để hỏi trước nhé.',
   feedback: 'Bạn có thể góp ý hoặc phản ánh qua hotline 0974 755 333 (hoặc Zalo cùng số), hay trực tiếp với nhân viên tại quầy để phòng khám tiếp nhận.',
+  privacy: 'Hồ sơ khám, đơn thuốc và hoá đơn của bạn chỉ bạn (khi đăng nhập) và nhân viên y tế của phòng khám xem được; mỗi lượt xem đều được ghi nhật ký. Về phòng khám riêng hay cách bố trí khi khám, mình chưa có thông tin chính xác — bạn gọi hotline 0974 755 333 để hỏi trước nhé.',
   unknown: 'Mình chưa có thông tin chính xác về việc này. Bạn gọi hotline 0974 755 333 để được giải đáp nhé.',
 };
 
@@ -266,7 +276,20 @@ const BOOKING_FAQ_REPLIES = {
   walkin: 'Mình chưa có thông tin chính xác về việc khám không hẹn trước. Bạn nên đặt lịch trước tại /dat-lich.html để chắc chắn có bác sĩ và không phải chờ; nếu muốn đến thẳng, bạn gọi hotline 0974 755 333 hỏi trước nhé.',
   relative: 'Được bạn nhé — khi đặt lịch bạn điền họ tên, tuổi, giới tính và số điện thoại của người đi khám (trẻ em thì chọn chuyên khoa Nhi khoa). Bạn đăng nhập tại /tai-khoan.html rồi đặt tại /dat-lich.html, hoặc nhắn mình đặt qua chat sau khi đăng nhập.',
   late: 'Mình chưa có quy định chính xác về việc đến trễ giờ hẹn. Nếu biết mình sẽ đến muộn, bạn gọi hotline 0974 755 333 báo trước để phòng khám sắp xếp; hoặc đổi sang khung giờ khác ở mục "Tất cả lịch hẹn của tôi" trên trang /dat-lich.html.',
+  followupFee: 'Mình chưa có thông tin chính xác về phí tái khám (có tính phí hay được giảm hay không). Bạn gọi hotline 0974 755 333 để hỏi trước nhé; giảm giá hiện có là cho thẻ BHYT và thẻ sinh viên, chỉ tính trên tiền khám.',
+  account: 'Website chưa có chức năng tự đổi số điện thoại, email hay xoá tài khoản; tài khoản bị khoá cũng chỉ quản trị viên mở lại được. Bạn gọi hotline 0974 755 333 để nhân viên hỗ trợ. Nếu đang chờ mã xác thực (OTP), mã được gửi qua email đã đăng ký — bạn kiểm tra cả hộp thư rác.',
+  howto: 'Đặt lịch online: (1) đăng nhập hoặc đăng ký miễn phí tại /tai-khoan.html; (2) vào /dat-lich.html, chọn chuyên khoa, bác sĩ (không bắt buộc), ngày và khung giờ còn trống; (3) điền họ tên, tuổi, giới tính, số điện thoại người khám rồi gửi. Lịch mới ở trạng thái Chờ xác nhận. Sau khi đăng nhập, bạn cũng có thể nhắn mình chuyên khoa và giờ muốn khám để mình đặt qua chat.',
+  confirm: 'Lịch mới đặt ở trạng thái Chờ xác nhận; hiện hệ thống chưa gửi tin nhắn hay email xác nhận, bạn theo dõi trạng thái ở mục "Tất cả lịch hẹn của tôi" trên trang /dat-lich.html. Mình chưa có thông tin chính xác về thời gian xác nhận — cần gấp thì bạn gọi hotline 0974 755 333.',
+  byPhone: 'Bạn có thể gọi hoặc nhắn Zalo hotline 0974 755 333 để nhân viên hỗ trợ đặt lịch, hoặc tự đặt online tại /dat-lich.html (cần đăng nhập). Sau khi đăng nhập, bạn cũng có thể nhắn mình đặt ngay trong khung chat này.',
+  guardian: 'Mình chưa có quy định chính xác của phòng khám về việc người dưới 18 tuổi tự đi khám. Thông thường trẻ em và người chưa đủ 18 tuổi nên có bố mẹ hoặc người giám hộ đi cùng để cung cấp thông tin bệnh sử và đồng ý điều trị. Bạn gọi hotline 0974 755 333 để hỏi trước nhé.',
+  results: 'Sau khi bác sĩ khám và ghi hồ sơ, bạn đăng nhập rồi vào trang Hồ sơ khám (/ho-so.html) để xem chẩn đoán, đơn thuốc và hoá đơn của từng lần khám (có thể in). Đã đăng nhập thì bạn cũng có thể hỏi mình "đơn thuốc lần trước của tôi" để tra nhanh.',
   duration: 'Mỗi lịch hẹn được xếp theo khung 30 phút. Tổng thời gian ở phòng khám còn tuỳ tình trạng bệnh và việc bác sĩ có chỉ định thêm xét nghiệm hay không, nên mình không báo chính xác được; bạn nên đến sớm vài phút trước giờ hẹn.',
+};
+
+const CONTACT_REPLIES = {
+  human: 'Mình là trợ lý ảo (AI) của phòng khám. Để nói chuyện với nhân viên, bạn gọi hoặc nhắn Zalo hotline 0974 755 333 trong giờ làm việc (7:00–21:00, Thứ 2 đến Thứ 7).',
+  doctor: 'Để được bác sĩ tư vấn trực tiếp, bạn đặt lịch khám tại /dat-lich.html (cần đăng nhập) — khi đặt có thể chọn bác sĩ cụ thể; hoặc gọi hotline 0974 755 333. Bạn kể triệu chứng để mình gợi ý chuyên khoa và bác sĩ phù hợp nhé.',
+  emergency: 'Phòng khám Đa khoa Đức Minh khám theo lịch hẹn, không phải cơ sở cấp cứu. Khi có dấu hiệu nguy hiểm (khó thở, đau ngực, ngất, chảy máu nhiều, co giật…) bạn hãy gọi 115 hoặc đến khoa cấp cứu của bệnh viện gần nhất.',
 };
 
 // Trả lời hỏi giá bằng số liệu CSDL, giảm giá tính sẵn.
@@ -278,6 +301,12 @@ function priceReply(clinic, price, specialty) {
   if (price.policy) {
     const rates = Object.entries(clinic.discountPercent).map(([c, p]) => `${DISCOUNT_CATEGORY_LABELS[c] || c} giảm ${p}%`);
     if (!rates.length) return 'Hiện phòng khám chưa có chương trình giảm giá, bạn gọi hotline 0974 755 333 để hỏi thêm nhé.';
+    if (price.expired) {
+      return `Giảm giá BHYT (${clinic.discountPercent.bhyt != null ? `${clinic.discountPercent.bhyt}%` : 'theo mức hiện hành'}) áp dụng khi thẻ còn hạn — nhân viên kiểm tra thẻ lúc thanh toán, nên thẻ đã hết hạn thường không được giảm. Bạn gọi hotline 0974 755 333 nếu muốn hỏi trường hợp cụ thể.`;
+    }
+    if (price.otherGroup || price.free) {
+      return `${price.otherGroup ? `Mình chưa có thông tin về mức giảm riêng cho ${price.otherGroup}.` : 'Mình chưa có thông tin về chương trình khám miễn phí.'} Hiện phòng khám giảm giá: ${rates.join(', ')} (chỉ tính trên tiền khám, mỗi lần khám 1 loại). Bạn gọi hotline 0974 755 333 để hỏi thêm nhé.`;
+    }
     if (price.both) {
       return `Các mức giảm không cộng dồn: mỗi lần khám chỉ áp dụng 1 loại giảm giá (${rates.join(', ')}). Bạn có cả 2 loại thẻ thì chọn loại giảm nhiều hơn khi đặt lịch và mang thẻ đó để nhân viên kiểm tra lúc thanh toán; giảm giá chỉ tính trên tiền khám, không giảm tiền thuốc.`;
     }
@@ -401,7 +430,8 @@ function specialtyFromConversation(message, turns) {
   // Trẻ em / mang thai quyết định chuyên khoa cho cả hội thoại, xét mọi lượt của khách.
   const userTurns = turns.filter((t) => t.role === 'user').reverse().map((t) => detectSpecialty(normalizeMessage(t.content).text));
   const person = userTurns.find((s) => s && s.byPerson);
-  if (person) return person.specialty;
+  const latest = userTurns.find(Boolean);
+  if (person && !(latest && latest.specialty === 'Răng – Hàm – Mặt')) return person.specialty;
   // Chuyên khoa trợ lý vừa gợi ý; bỏ qua câu nhắc từ 2 khoa trở lên (bảng giá, danh sách khoa).
   for (let i = turns.length - 1; i >= 0; i--) {
     if (turns[i].role !== 'assistant') continue;
@@ -462,7 +492,7 @@ function specialtyFollowUpReply(kind, specialty, named, message, turns, lastAssi
 const BOOKING_SUMMARY_HEAD = 'Mình tóm tắt thông tin đặt lịch:';
 const BOOKING_DONE_RE = /^(?:Đặt lịch thành công|Đã gửi yêu cầu khám Chủ nhật|Mình đã huỷ yêu cầu đặt lịch)/;
 const CONFIRM_RE = /xác nhận|đúng rồi|đồng ý|chốt|đặt (?:đi|luôn|giúp|nhé)|^\s*(?:ok\p{L}*|oke|có|ừ+|vâng|dạ|được|đúng)\b/iu;
-const CANCEL_RE = /không (?:muốn )?đặt|(?:huỷ|hủy) (?:yêu cầu|đặt|việc đặt)|^\s*thôi(?: không đặt nữa| bỏ qua)?\s*[.!]*$|từ chối/i;
+const CANCEL_RE = /không (?:muốn )?đặt|(?:huỷ|hủy) (?:yêu cầu|đặt|việc đặt|đi|nhé|nha|luôn)|^\s*(?:không,?\s*)?(?:huỷ|hủy)\s*[.!]*$|^\s*thôi(?: không đặt nữa| bỏ qua)?\s*[.!]*$|từ chối/i;
 const FLOW_PROMPT_RE = /^(?:Để đặt lịch, mình cần thêm|Mình đã ghi nhận)/;
 const EDIT_RE = /sửa|đổi|thay|nhầm|sai/i;
 const GENDER_LABEL = { nam: 'Nam', nu: 'Nữ', khac: 'Khác' };
@@ -839,7 +869,9 @@ router.post('/chat', optionalAuthenticate, async (req, res) => {
     const facts = analyzeMessage(msg, todayVN).map((n) => `- ${n}`);
     // Đang đặt lịch dở (có số điện thoại, hoặc có tuổi khi đang thu thập thông tin) — các lối tắt bên dưới không cắt ngang.
     const inBookingFlow = turns.slice(-4).some((t) => /họ tên|số điện thoại|xác nhận|đặt lịch/i.test(t.content));
-    const bookingDetails = facts.some((f) => /Số điện thoại/.test(f)) || (inBookingFlow && facts.some((f) => /Tuổi/.test(f)));
+    // Tin chỉ có 1 dãy số ở đầu hội thoại ("123456") không phải thông tin đặt lịch.
+    const hasPhone = facts.some((f) => /Số điện thoại/.test(f)) && (inBookingFlow || /\p{L}{2,}/u.test(msg));
+    const bookingDetails = hasPhone || (inBookingFlow && facts.some((f) => /Tuổi/.test(f)));
     const emergency = detectEmergency(msg);
     if (emergency.length) {
       facts.unshift(`- CẤP CỨU: khách nói "${emergency.join(', ')}" → câu ĐẦU TIÊN phải khuyên gọi cấp cứu 115 hoặc đến ngay cơ sở y tế gần nhất.`);
@@ -852,12 +884,35 @@ router.post('/chat', optionalAuthenticate, async (req, res) => {
       && /thứ|chủ nhật|mai|ngày kia|hôm nay|\d{1,2}\s*[/.-]\s*\d{1,2}/.test(msg)) {
       slotQuery = detectSlotQuery(`${msg} còn trống không`, todayVN);
     }
+    // Chỉ nói ngày ("thứ 7 này", "tuần này") khi đã rõ chuyên khoa → tra lịch ngày đó (trừ lúc đang gom thông tin đặt lịch).
+    const BARE_DATE_RE = /^(?:vào |ngày |hôm |còn )?(?:thứ\s*\d|thứ (?:hai|ba|tư|năm|sáu|bảy)|chủ nhật|mai|ngày mai|ngày kia|hôm nay|tuần (?:này|sau|tới)|\d{1,2}\s*[/.-]\s*\d{1,2})(?: (?:này|tuần (?:này|sau|tới)|nhé|nha|thì sao|được không|thì sao ạ))?\s*[?.!]*$/;
+    const collecting = /ghi nhận|tóm tắt thông tin/.test(lastAssistantText);
+    if (!slotQuery && !collecting && BARE_DATE_RE.test(msg) && specialtyFromConversation(msg, turns)) {
+      slotQuery = detectSlotQuery(`${msg} còn trống không`, todayVN);
+    }
+    // Chỉ nói buổi ("chiều") ngay sau danh sách lịch trống → lọc đúng ngày vừa xem theo buổi.
+    const shownDate = lastAssistantText.match(/^Lịch còn trống khoa [^\n]*\n- [^\d]*(\d{2})\/(\d{2})\/(\d{4})/);
+    const periodOnly = msg.match(/^(?:buổi |vào buổi )?(sáng|chiều|tối)(?: (?:nhé|nha|được không|thì sao))?\s*[?.!]*$/);
+    if (!slotQuery && shownDate && periodOnly) slotQuery = { dates: [`${shownDate[3]}-${shownDate[2]}-${shownDate[1]}`], period: periodOnly[1] };
+    // Trợ lý vừa hỏi "xem lịch trống của chuyên khoa nào?" → khách trả lời tên khoa: tra lại ngày khách hỏi trước đó.
+    const askedSpecialty = /Bạn muốn xem lịch trống của chuyên khoa nào/.test(lastAssistantText);
+    const previousAsk = (turns.filter((t) => t.role === 'user').pop() || {}).content || '';
+    if (!slotQuery && askedSpecialty && detectSpecialty(msg)) slotQuery = detectSlotQuery(`${normalizeMessage(previousAsk).text} còn trống không`, todayVN);
+    // Đồng ý ("có", "ok") ngay sau lời mời xem lịch trống.
+    if (!slotQuery && /xem lịch trống[^?]*\?\s*$/.test(lastAssistantText) && /^(?:có|ok\p{L}*|oke|vâng|dạ|ừ+|được|xem|muốn|có ạ|dạ có|có chứ|xem đi|xem giúp)(?:\s+(?:ạ|nhé|nha|đi|giúp mình|giúp em|luôn))*[\s.!]*$/iu.test(msg)) {
+      slotQuery = detectSlotQuery('còn trống không', todayVN);
+    }
     let suggested = detectSpecialty(msg);
     // Hội thoại về trẻ em/mang thai: tin sau chỉ nói triệu chứng vẫn thuộc Nhi/Sản, trừ khi khách nói rõ là chính mình.
     const userSpecialties = turns.filter((t) => t.role === 'user').reverse().map((t) => detectSpecialty(normalizeMessage(t.content).text));
     if (suggested && !suggested.byPerson && !/(?<!\p{L})(?:tôi|mình|em) (?:cũng )?(?:đang )?bị/u.test(msg)) {
       const person = userSpecialties.find((s) => s && s.byPerson);
-      if (person) suggested = { ...person, keywords: suggested.keywords };
+      if (person && suggested.specialty !== 'Răng – Hàm – Mặt') suggested = { ...person, keywords: suggested.keywords };
+    }
+    // "con tôi bị đau răng" → "cháu 5 tuổi": răng miệng của trẻ vẫn khám Răng – Hàm – Mặt.
+    if (suggested && suggested.specialty === 'Nhi khoa' && msg.split(/\s+/).length <= 4 && /\d+\s*(?:tuổi|tháng)/.test(msg)) {
+      const teeth = userSpecialties.slice(0, 3).find((s) => s && s.specialty === 'Răng – Hàm – Mặt');
+      if (teeth) suggested = teeth;
     }
     // Tin chỉ thêm triệu chứng toàn thân sau triệu chứng của 1 khoa cụ thể — giữ khoa đó.
     if (suggested && suggested.specialty === 'Nội tổng quát' && suggested.keywords.every((k) => GENERAL_SYMPTOM_RE.test(k))) {
@@ -881,7 +936,7 @@ router.post('/chat', optionalAuthenticate, async (req, res) => {
       return reply('Bỏng nhẹ: bạn xả vết bỏng dưới vòi nước mát (không dùng nước đá) khoảng 15–20 phút, tháo nhẫn, đồng hồ gần chỗ bỏng, rồi che bằng gạc sạch; không bôi kem đánh răng, nước mắm hay dầu và không chọc vỡ bóng nước. Bỏng rộng hơn lòng bàn tay, bỏng sâu (da trắng bệch hoặc cháy đen), bỏng ở mặt, bộ phận sinh dục, bỏng do điện, hoá chất hay bỏng ở trẻ nhỏ thì cần đến cơ sở y tế ngay hoặc gọi 115.');
     }
     // Chưa đăng nhập mà gửi thông tin người khám — lịch chưa được đặt; nói rõ để khách không tưởng đã xong.
-    if (COMPACT_PROMPT && !req.user && bookingDetails && !emergency.length) {
+    if (COMPACT_PROMPT && !req.user && hasPhone && !emergency.length) {
       const specialty = specialtyFromConversation(msg, turns);
       return reply([
         'Mình đã nhận thông tin của bạn, nhưng lịch hẹn CHƯA được đặt: chatbot chỉ đặt lịch được cho tài khoản đã đăng nhập.',
@@ -889,8 +944,11 @@ router.post('/chat', optionalAuthenticate, async (req, res) => {
       ].join(' '));
     }
     // Câu hỏi quanh việc đặt lịch phải trả lời trước nhánh nhắc đăng nhập; đặt cho người nhà khi đã đăng nhập thì để luồng đặt lịch xử lý.
-    const bookingFaq = shortcutOk && !slotQuery ? detectBookingFaq(msg) : null;
+    const ownDataAsked = req.user && req.user.role === 'patient' && detectOwnDataKind(msg);
+    const bookingFaq = shortcutOk && !slotQuery && !ownDataAsked ? detectBookingFaq(msg) : null;
     if (bookingFaq && !(bookingFaq === 'relative' && req.user)) return reply(BOOKING_FAQ_REPLIES[bookingFaq]);
+    const contact = shortcutOk && !slotQuery ? detectContactRequest(msg) : null;
+    if (contact) return reply(CONTACT_REPLIES[contact]);
     if (shortcutOk && !slotQuery && /ở đâu|địa chỉ/.test(msg) && detectHoursQuestion(msg)) {
       return reply('Phòng khám Đa khoa Đức Minh ở Phường Túc Duyên, TP. Thái Nguyên; làm việc 7:00–21:00 từ Thứ 2 đến Thứ 7 (khung giờ khám muộn nhất 20:30). Chủ nhật chỉ khám theo hẹn trước với 1 bác sĩ cụ thể. Hotline: 0974 755 333.');
     }
@@ -967,9 +1025,9 @@ router.post('/chat', optionalAuthenticate, async (req, res) => {
     // Câu "giá đã gồm xét nghiệm/thuốc chưa", "trả góp" để quy trình chính.
     let price = detectPriceQuestion(msg);
     // Vừa trả lời giá, khách hỏi tiếp cụt: "sinh viên thì sao", "còn bhyt", "cả 2 thì sao".
-    if (!price && /^Giá khám chuyên khoa|^Có bạn nhé — .*giảm/.test(lastAssistantText) && msg.split(/\s+/).length <= 6) {
+    if (!price && /^Giá khám chuyên khoa|^Có bạn nhé — .*giảm/.test(lastAssistantText) && msg.split(/\s+/).length <= 10) {
       if (/cả (?:2|hai)|cộng dồn|gộp|cùng lúc/.test(msg)) price = { policy: true, discount: null, both: true };
-      else if (/bhyt|bảo hiểm|sinh viên/.test(msg)) price = detectPriceQuestion(`${msg} còn bao nhiêu`);
+      else if (/bhyt|bảo hiểm|sinh viên/.test(msg)) price = detectPriceQuestion(`${msg.replace(/[^,.]*không phải sinh viên[,.]?/, '')} còn bao nhiêu`);
     }
     // "vậy còn bao nhiêu" sau "sinh viên có giảm không" — lấy loại giảm giá khách vừa nhắc.
     if (price && !price.list && !price.policy && !price.discount) {
@@ -1022,13 +1080,41 @@ router.post('/chat', optionalAuthenticate, async (req, res) => {
     if (shortcutOk && !slotQuery && followUp && followUpSpecialty && (priorSpecialty || ownSymptoms || followUp === 'why')) {
       return reply(specialtyFollowUpReply(followUp, followUpSpecialty, namedSpecialty, msg, turns, lastAssistantText));
     }
+    if (shortcutOk && !slotQuery && detectContagionQuestion(msg)) {
+      return reply([
+        'Có lây hay không còn tuỳ nguyên nhân: nhiều bệnh do virus, vi khuẩn (cảm cúm, viêm họng, sổ mũi do virus, sởi, thuỷ đậu, tiêu chảy nhiễm khuẩn…) lây qua giọt bắn, tay bẩn hoặc tiếp xúc gần; còn nhiều bệnh khác thì không lây. Bác sĩ cần khám mới xác định được.',
+        'Trong lúc chờ khám, bạn nên rửa tay thường xuyên, đeo khẩu trang, không dùng chung khăn, cốc, đồ ăn và hạn chế tiếp xúc gần với trẻ nhỏ, người già, người đang mang thai.',
+        conversationSpecialty ? `Chuyên khoa phù hợp để khám là ${conversationSpecialty}.` : '',
+      ].filter(Boolean).join(' '));
+    }
+    if (shortcutOk && !slotQuery && /^(?:vậy |thế |thì )?(?:khám |đến |phòng khám )?(?:ở )?đâu(?: vậy| ạ| nhỉ)?\s*[?]*$|^(?:vậy |thế )?(?:khám|đến) ở đâu/.test(msg)) {
+      return reply(`Phòng khám Đa khoa Đức Minh ở Phường Túc Duyên, TP. Thái Nguyên (hotline 0974 755 333).${conversationSpecialty ? ` Bạn khám chuyên khoa ${conversationSpecialty} tại đây — mình có thể giúp xem lịch trống.` : ''}`);
+    }
+    if (shortcutOk && !slotQuery && conversationSpecialty && turns.length && !suggested && !/\?/.test(msg) && msg.split(/\s+/).length <= 5
+      && /(?:từ|đã|được|khoảng|tầm|mấy|gần|hơn)\s*\d*\s*(?:ngày|hôm|tuần|tháng|năm)|hôm qua|tối qua|sáng nay|mấy (?:ngày|hôm) nay|lâu rồi/.test(msg)) {
+      return reply(`Mình ghi nhận thời gian bạn bị (${msg}). Chuyên khoa phù hợp vẫn là ${conversationSpecialty} (${clinic.describeSpecialty(conversationSpecialty)}). Bạn nên đi khám sớm, nhất là khi triệu chứng không đỡ hoặc nặng dần; nếu đau dữ dội, khó thở, ngất thì gọi 115 ngay. Bạn có muốn mình xem lịch trống không?`);
+    }
+    if (shortcutOk && !slotQuery && /bác sĩ (?:nữ|nam)(?!\p{L})/u.test(msg)) {
+      return reply(`Mình chưa có thông tin về giới tính của từng bác sĩ. ${doctorListReply(clinic, conversationSpecialty)} Bạn gọi hotline 0974 755 333 để hỏi và chọn bác sĩ phù hợp.`);
+    }
+    // Chỉ bổ sung tuổi ("cháu 5 tuổi") hoặc hỏi chọn giữa 2 khoa ("khám nhi hay răng") — trả lời theo khoa đang bàn.
+    const choosesBetween = /(?<!\p{L})hay(?!\p{L})/u.test(msg) && (msg.match(/nhi|răng|nội|sản|da liễu|tai mũi họng/g) || []).length >= 2;
+    const ageOnly = msg.split(/\s+/).length <= 4 && /\d+\s*(?:tuổi|tháng)/.test(msg);
+    if (shortcutOk && !slotQuery && conversationSpecialty && turns.length && (choosesBetween || ageOnly)) {
+      const child = [msg, ...turns.filter((t) => t.role === 'user').map((t) => t.content)].some((t) => /(?<!\p{L})(?:bé|cháu|con|trẻ)(?!\p{L})/iu.test(t));
+      return reply([
+        `Bạn nên khám chuyên khoa ${conversationSpecialty} (${clinic.describeSpecialty(conversationSpecialty)}).`,
+        child && conversationSpecialty === 'Răng – Hàm – Mặt' ? 'Bệnh răng miệng của trẻ em cũng khám ở Răng – Hàm – Mặt chứ không phải Nhi khoa.' : '',
+        'Bạn có muốn mình xem lịch trống không?',
+      ].filter(Boolean).join(' '));
+    }
     if (shortcutOk && !slotQuery && conversationSpecialty && /khoa nào|nên khám (?:gì|ở khoa nào)|khám gì|chuyên khoa gì/i.test(msg)) {
       return reply(`Bạn nên khám chuyên khoa ${conversationSpecialty} (${clinic.describeSpecialty(conversationSpecialty)}). Bạn có muốn mình xem lịch trống không?`);
     }
     if (shortcutOk && !slotQuery && !conversationSpecialty && /khoa nào|nên khám (?:gì|ở đâu)|khám gì/i.test(msg)) {
       return reply(`Bạn kể giúp mình triệu chứng (khó chịu ở đâu, từ bao giờ) và người đi khám là người lớn, trẻ em hay người đang mang thai để mình gợi ý đúng khoa nhé. Phòng khám có ${SPECIALTIES.length} chuyên khoa: ${SPECIALTIES.join(', ')}.`);
     }
-    if (shortcutOk && !slotQuery && /(?:huỷ|hủy|đổi|dời|sửa)[^.?!]{0,15}(?:lịch|giờ khám|ngày khám|sang ngày)/i.test(msg)) {
+    if (shortcutOk && !slotQuery && /(?:huỷ|hủy|đổi|dời|sửa)[^.?!]{0,15}(?:lịch|giờ khám|ngày khám|sang ngày)|(?:làm sao|cách|thế nào)(?: để)? (?:huỷ|hủy|đổi)|^\s*(?:vậy )?(?:huỷ|hủy) (?:thế nào|sao|ở đâu)/i.test(msg)) {
       return reply('Bạn đăng nhập rồi vào trang Đặt lịch (/dat-lich.html), mục "Tất cả lịch hẹn của tôi": bấm "Huỷ" để huỷ, hoặc chọn lịch để sửa ngày giờ (chỉ sửa được khi lịch đang chờ xác nhận hoặc đã xác nhận). Huỷ lịch trên hệ thống không mất phí; cần hỗ trợ thì gọi hotline 0974 755 333.');
     }
 
@@ -1074,7 +1160,9 @@ router.post('/chat', optionalAuthenticate, async (req, res) => {
           ? [
               `Lịch còn trống khoa ${specialty}:`,
               ...slotLines,
-              req.user
+              slotLines.every((l) => !/\d{2}:\d{2}/.test(l))
+                ? 'Không còn giờ nào bạn đặt được trong khoảng này — bạn chọn ngày hoặc buổi khác nhé.'
+                : req.user
                 ? 'Bạn muốn chọn giờ nào? Mình có thể đặt lịch giúp bạn luôn.'
                 : 'Bạn muốn chọn giờ nào? Bạn đăng nhập tại /tai-khoan.html để mình đặt giúp, hoặc tự đặt tại /dat-lich.html.',
             ].join('\n')
@@ -1293,6 +1381,7 @@ router.post('/chat', optionalAuthenticate, async (req, res) => {
         ? SPECIALTIES.filter((s) => s !== suggested.specialty).map((s) => new RegExp(s.replace(/\s*–\s*/g, '\\s*[–-]\\s*'), 'i'))
         : [];
       const isQuestion = (s) => s.trim().endsWith('?');
+      const echoedQuestion = msg.toLowerCase().replace(/[\s?!.]+$/, '');
       const drop = (s) => /mình (?:sẽ |đang |có thể )?(?:(?:giúp|hỗ trợ)(?: bạn)? )?(?:kiểm tra|xem|check|đặt) lịch|mình (?:sẽ |đang |có thể )?(?:giúp|hỗ trợ)(?: bạn)? (?:kiểm tra|xem|check|đặt)|mình sẽ (?:kiểm tra|xem|check|hỗ trợ)|sẽ báo lại|(?:mình|tôi) sẽ kiểm tra/i.test(s) && !isQuestion(s)
         || /(?:dùng|uống) (?:thêm )?thuốc (?:hỗ trợ|ngủ|an thần|giảm đau|kháng sinh)|thuốc hỗ trợ ngủ/i.test(s)
         || /chườm (?:đá|lạnh|nước đá)|(?:không cần|nên) ngừng (?:uống )?thuốc/i.test(s)
@@ -1304,6 +1393,9 @@ router.post('/chat', optionalAuthenticate, async (req, res) => {
         || /^\s*bạn (?:đang )?bị [^.?!,\n]{1,40}[.!]?\s*$/i.test(s)
         || /một trong hai cách này|Lịch CHƯA được đặt/i.test(s)
         || (/^[\x00-\x7F]+$/.test(s.trim()) && /\b(?:the|is|are|you|I|am|to|of|and|have)\b/.test(s))
+        // Đòi thông tin đặt lịch khi khách chưa muốn đặt, và hỏi lại nguyên văn câu của khách.
+        || (!inBookingFlow && !BOOKING_INTENT_RE.test(msg) && /(?:số điện thoại|họ tên|tên bác sĩ|giới tính)[^.?!]{0,60}(?:lý do khám|tuổi|giới tính|số điện thoại)/i.test(s))
+        || (isQuestion(s) && echoedQuestion.length > 8 && s.toLowerCase().includes(echoedQuestion))
         // Tự đoán nguyên nhân bệnh — chẩn đoán là việc của bác sĩ.
         || /(?:có thể|thường) (?:là )?do |(?:xảy ra|gây ra|chủ yếu|thường) do |có thể (?:là )?(?:bị )?bệnh \S|có thể (?:là )?dấu hiệu (?:của )?(?:thiếu|bệnh|rối loạn|nhiễm|viêm|virus)/i.test(s)
         || (!slotQuery && !isQuestion(s)
@@ -1323,7 +1415,7 @@ router.post('/chat', optionalAuthenticate, async (req, res) => {
       }
     }
     if (lastAssistantText && sameReply(answer, lastAssistantText)) {
-      answer = conversationSpecialty
+      answer = conversationSpecialty && /khoa|tại sao|vì sao/.test(msg)
         ? specialtyFollowUpReply('why', conversationSpecialty, null, msg, turns, lastAssistantText)
         : 'Mình vừa trả lời ý này ở trên. Bạn muốn hỏi rõ thêm điều gì — lý do chọn chuyên khoa, giá khám, bác sĩ hay lịch trống — để mình trả lời đúng ý nhé?';
     }

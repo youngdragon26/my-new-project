@@ -21,7 +21,7 @@ function describeDate(iso) {
   return `${iso} (${wd})`;
 }
 
-const MEASUREMENT_RE = /đường huyết|đường máu|huyết áp|chỉ số|kết quả|xét nghiệm|mmol|hba1c|cholesterol|mỡ máu|men gan|axit uric|acid uric|creatinin|nhiệt độ|\d\s*độ|kg|cân nặng|%/;
+const MEASUREMENT_RE = /đường huyết|đường máu|huyết áp|chỉ số|kết quả|xét nghiệm|mmol|hba1c|cholesterol|mỡ máu|men gan|axit uric|acid uric|creatinin|nhiệt độ|\d\s*độ|sốt|kg|cân nặng|%/;
 
 function analyzeMessage(message, todayISO) {
   const text = String(message || '');
@@ -123,7 +123,7 @@ const SHORTHAND = {
   e: 'em', bs: 'bác sĩ', pk: 'phòng khám', sdt: 'số điện thoại', 'sđt': 'số điện thoại', ng: 'người',
   'phỉa': 'phải', phai: 'phải', 'trả lười': 'trả lời', 'tl': 'trả lời',
   h: 'giờ', t2: 'thứ 2', t3: 'thứ 3', t4: 'thứ 4', t5: 'thứ 5', t6: 'thứ 6', t7: 'thứ 7', cn: 'chủ nhật',
-  'bao nhiu': 'bao nhiêu', nhiu: 'nhiêu', 'bnhiu': 'bao nhiêu',
+  'bao nhiu': 'bao nhiêu', nhiu: 'nhiêu', 'bnhiu': 'bao nhiêu', 'răg': 'răng', 'đâù': 'đầu',
   // "khao" lẻ là "khao khát" — chỉ sửa khi đi với chữ hay gặp sau "khoa".
   tui: 'tôi', 'bịnh': 'bệnh', 'bao tử': 'dạ dày', 'ở mô': 'ở đâu', 'đi cầu': 'đi ngoài', 'tào tháo rượt': 'tiêu chảy',
   vk: 'vợ', 'ck e': 'chồng em', 'ck em': 'chồng em', 'ck mk': 'chồng mình', 'ck mình': 'chồng mình', 'ck tôi': 'chồng tôi',
@@ -153,7 +153,7 @@ const ACCENT_PHRASES = {
   'chuyen khoa': 'chuyên khoa', 'bac si': 'bác sĩ', 'phong kham': 'phòng khám', gia: 'giá', 'gia kham': 'giá khám',
   'gio lam viec': 'giờ làm việc', 'dia chi': 'địa chỉ', 'o dau': 'ở đâu', thuoc: 'thuốc', 'khang sinh': 'kháng sinh', uong: 'uống',
   dau: 'đau', 'dau hong': 'đau họng', 'viem hong': 'viêm họng', 'rat hong': 'rát họng', 'ho khan': 'ho khan',
-  'ho co dom': 'ho có đờm', sot: 'sốt', 'sot cao': 'sốt cao', 'sot nhe': 'sốt nhẹ', 'so mui': 'sổ mũi', 'nghet mui': 'nghẹt mũi',
+  'ho co dom': 'ho có đờm', 'ho dem': 'ho đêm', sot: 'sốt', 'sot cao': 'sốt cao', 'sot nhe': 'sốt nhẹ', 'so mui': 'sổ mũi', 'nghet mui': 'nghẹt mũi',
   mui: 'mũi', 'dau tai': 'đau tai', 'u tai': 'ù tai', 'chay mu tai': 'chảy mủ tai', 'viem xoang': 'viêm xoang', 'khan tieng': 'khàn tiếng',
   'dau rang': 'đau răng', 'sau rang': 'sâu răng', 'nho rang': 'nhổ răng', 'sung loi': 'sưng lợi', 'viem loi': 'viêm lợi',
   'chay mau chan rang': 'chảy máu chân răng', ngua: 'ngứa', 'noi man': 'nổi mẩn', 'man do': 'mẩn đỏ', 'phat ban': 'phát ban',
@@ -228,37 +228,38 @@ const PERSON_RULES = [
   ['Sản phụ khoa', words('mang thai', 'có thai', 'có bầu', 'bầu', 'thai', 'khám thai', 'kinh nguyệt', 'trễ kinh', 'chậm kinh', 'rong kinh', 'đau bụng kinh', 'hành kinh', 'chu kỳ kinh', 'nghén', 'khí hư', 'vùng kín', 'phụ khoa', 'sản khoa', 'sản phụ khoa', 'khoa sản', 'khám sản', 'âm đạo',
     'tắc (?:tia )?sữa', 'cho con bú', 'viêm tuyến vú', 'căng sữa', 'mất sữa', 'sau sinh',
     '(?:quan hệ|giao hợp)(?: xong| xong bị)? (?:bị )?ra máu', 'ra máu sau (?:khi )?quan hệ', 'đau khi quan hệ', 'tránh thai', 'vô sinh', 'hiếm muộn',
-    'chưa có con', 'que thử thai', '(?:2|hai) vạch', 'lộ tuyến', 'cổ tử cung', 'tử cung', 'buồng trứng', 'u xơ', 'tiền sản giật', '(?<!sữa )vú', 'núm vú', 'tuyến vú')],
+    'chưa có con', 'que thử thai', '(?:2|hai) vạch', 'lộ tuyến', 'cổ tử cung', 'tử cung', 'buồng trứng', 'u xơ', 'tiền sản giật', '(?<!sữa )vú', 'núm vú', 'tuyến vú', 'rụng trứng', 'mãn kinh', 'tiền mãn kinh')],
 ];
 const GYN_RE = words('mang thai', 'có thai', 'có bầu', 'kinh nguyệt', 'trễ kinh', 'chậm kinh', 'rong kinh', 'đau bụng kinh', 'hành kinh', 'chu kỳ kinh', 'khí hư', 'vùng kín', 'phụ khoa');
 const SYMPTOM_RULES = [
   ['Răng – Hàm – Mặt', words('răng', 'nướu', 'nha khoa', 'hôi miệng', '(?:sưng|viêm|chảy máu|tụt) lợi', 'quai hàm', 'hàm (?:trên|dưới)', 'niềng',
-    'nhiệt miệng', '(?:bị|nổi) nhiệt', 'lở miệng', 'loét miệng', 'lưỡi', 'khớp hàm', 'hàm (?:kêu|đau)')],
+    'nhiệt miệng', '(?:bị|nổi) nhiệt', 'lở miệng', 'loét miệng', 'lưỡi', 'khớp hàm', 'hàm (?:kêu|đau|bị lệch|lệch)', 'lệch hàm', 'khi nhai', 'nhai (?:đau|khó|bị)', 'nghiến răng')],
   ['Tai – Mũi – Họng', words('họng', 'amidan', 'amiđan', 'tai(?! nạn| biến)', 'mũi', 'xoang', 'khàn tiếng', 'mất tiếng', 'chảy máu cam', 'tai mũi họng', 'khó nuốt', 'nuốt (?:đau|vướng)',
     'điếc', 'nghe kém', '(?<!ngứa )ngáy', 'hắt hơi', 'lỗ tai')],
   ['Da liễu', words('ngứa', 'mụn', 'mẩn', 'nổi mẩn', 'phát ban', 'mề đay', 'nấm', 'vảy nến', 'chàm', 'rụng tóc', 'lang ben', 'zona', 'dị ứng', 'da liễu', '(?:trên|ngoài|ở) da', 'da (?:mặt|tay|chân|đầu|bị|khô)',
-    'nám', 'sạm da', 'rạn da', 'hôi chân', 'gàu', 'mụn rộp', 'thuỷ đậu', 'thủy đậu', 'nốt ruồi', 'tàn nhang', 'mụn ruồi', 'hôi nách', 'mụn cóc', 'tóc (?:gãy|rụng)', 'khám da', 'khoa da',
+    'nám', 'sạm da', 'rạn da', 'hôi chân', 'gàu', 'mụn rộp', 'thuỷ đậu', 'thủy đậu', 'nốt ruồi', 'tàn nhang', 'mụn ruồi', 'hôi nách', 'mụn cóc', 'tóc (?:gãy|rụng)', 'khám da', 'khoa da', 'móng (?:tay|chân)', 'rôm sảy',
     'hắc lào', 'ghẻ', 'chốc lở', 'mụn nhọt', 'á sừng', 'hăm(?: tã)?')],
   // "đau đầu gối" là đau khớp gối, không phải đau đầu.
-  ['Nội tổng quát', words('sốt', 'ho', 'đau bụng', 'tiêu chảy', 'đau đầu(?! gối)', 'nhức đầu(?! gối)', 'chóng mặt', 'huyết áp', 'tiểu đường', 'đường huyết', 'mỡ máu', 'mệt mỏi', 'dạ dày', 'khó tiêu', 'ợ chua', 'trào ngược', 'thượng vị', 'buồn nôn', 'nôn', 'táo bón', 'cảm cúm', 'cúm', 'bị cảm', 'cảm lạnh', 'khám sức khỏe', 'khám sức khoẻ', 'khám tổng quát', 'nội khoa', 'nội tổng quát', 'khoa nội', 'khám nội', 'tim', 'gan', 'sỏi thận', 'đau thận',
+  ['Nội tổng quát', words('sốt', 'ho', 'đau bụng', 'tiêu chảy', 'đau đầu(?! gối)', 'nhức đầu(?! gối)', 'chóng mặt', 'huyết áp', 'tiểu đường', 'đường huyết', 'mỡ máu', 'mệt mỏi', 'dạ dày', 'khó tiêu', 'ợ chua', 'trào ngược', 'thượng vị', 'buồn nôn', 'nôn', 'táo bón', 'cảm cúm', 'cúm', 'bị cảm', 'cảm lạnh', 'khám sức khỏe', 'khám sức khoẻ', 'khám tổng quát', 'nội khoa', 'nội tổng quát', 'khoa nội', 'khám nội', 'khám lại nội', 'tim', 'gan', 'sỏi thận', 'đau thận',
     'hay quên', 'trí nhớ', 'sụt cân', 'chán ăn', 'nấc', 'trúng gió', 'say nắng', 'mồ hôi', 'ợ nóng', 'phế quản', 'viêm phổi', 'sốt xuất huyết',
     '(?:đau|rát|buốt) (?:\\p{L}+ )?khi (?:đi )?tiểu', 'thương hàn', 'bỏ thuốc lá', 'cai thuốc', 'nghiện rượu',
     'trầm cảm', 'lo âu', 'căng thẳng', 'stress', 'hoảng loạn', 'nổi hạch', 'hạch', 'thiếu máu', 'covid', 'cúm a',
     'bụng (?:đau|chướng)', 'đầu (?:đau|nhức)', 'đau quặn', '(?:quanh|vùng|ở) rốn', 'đầy bụng', 'chướng bụng', 'ợ hơi',
-    'đi ngoài', 'phân lỏng', 'ớn lạnh', 'lúc nóng lúc lạnh', 'khát nước', 'phù (?:chân|mặt|người)', 'đánh trống ngực', 'hồi hộp', 'vàng da', 'phân đen', 'rét run',
+    'đi ngoài', 'phân lỏng', 'ớn lạnh', 'lúc nóng lúc lạnh', 'khát nước', 'phù (?:chân|mặt|người)', '(?:chân|mặt|người) (?:bị )?phù', 'bầm tím', 'dễ bầm', 'tăng cân', 'béo phì', 'thừa cân', 'say (?:xe|tàu)', 'đại tiện', 'hậu môn', 'đánh trống ngực', 'hồi hộp', 'vàng da', 'phân đen', 'rét run',
     // Không có khoa Nam học, Cơ xương khớp, Tiết niệu, Hậu môn – trực tràng — Nội tổng quát khám ban đầu.
     'tinh hoàn', 'xuất tinh', 'cương dương',
-    '(?:đau|sưng|mỏi|nhức|cứng) (?:đầu gối|khớp gối|lưng|khớp|vai|gáy|cổ|gối|chân|tay|hông|háng|xương|gót chân|cổ tay|cổ chân|mắt cá|bắp chân|đùi|cột sống)',
-    'đầu gối', 'cổ tay', 'cổ chân', 'mắt cá chân', 'xương khớp', 'thoái hoá', 'thoái hóa', 'thoát vị', 'đĩa đệm', 'cột sống', 'loãng xương', 'bong gân', 'chuột rút', 'viêm khớp',
+    '(?:đau|sưng|mỏi|nhức|cứng) (?:ở |vùng |bên )?(?:đầu gối|khớp gối|lưng|khớp|vai|gáy|cổ|gối|chân|tay|hông|háng|xương|gót chân|cổ tay|cổ chân|mắt cá|bắp chân|đùi|cột sống)',
+    'đầu gối', 'lưng (?:trên|dưới)', 'cổ tay', 'cổ chân', 'mắt cá chân', 'xương khớp', 'thoái hoá', 'thoái hóa', 'thoát vị', 'đĩa đệm', 'cột sống', 'loãng xương', 'bong gân', 'chuột rút', 'viêm khớp',
     'gai (?:cột sống|xương)', 'tê (?:tay|chân|bì)', 'gout', 'gút', 'tiểu (?:buốt|rắt|ra máu|nhiều|đêm)',
-    'trĩ', 'mất ngủ', 'khó ngủ', 'đau nửa đầu', 'run tay', 'tuyến giáp', 'bướu cổ')],
+    'trĩ', 'mất ngủ', 'khó ngủ', 'đau nửa đầu', 'run tay', 'tuyến giáp', 'bướu cổ',
+    'ngón (?:chân|tay)', 'nổi cục', 'có cục', 'cục u', 'khó thở khi (?:leo|đi|chạy|gắng sức|vận động|tập|làm)', 'sởi', 'quai bị')],
 ];
 
 // "dị ứng kháng sinh" là khai tiền sử, không phải hỏi mua kháng sinh.
 const PRESCRIPTION_RE = words('(?<!dị ứng )(?<!dị ứng thuốc )kháng sinh', 'kê đơn', 'thuốc kê đơn', 'corticoid', 'thuốc ngủ', 'thuốc an thần',
   'amoxicil+in', 'augmentin', 'cefuroxim', 'cefixim', 'cephalexin', 'azithromycin', 'ciprofloxacin', 'clarithromycin', 'metronidazol');
 // "bệnh nhân", "bệnh viện", "khám có đau không" không phải than ốm.
-const VAGUE_RE = words('(?<!có )đau(?! không)', 'mệt', 'mệt mỏi', 'không khỏe', 'không khoẻ', 'khó chịu', 'ốm', 'bệnh(?! nhân| viện| án)');
+const VAGUE_RE = words('(?<!có |giảm )đau(?! không)', 'mệt', 'mệt mỏi', 'không khỏe', 'không khoẻ', 'khó chịu', 'ốm', 'bệnh(?! nhân| viện| án)');
 // "vàng da vàng mắt" là bệnh gan/mật (Nội), không phải bệnh mắt.
 const EYE_RE = words('(?<!vàng )mắt', 'cận thị', 'loạn thị', 'viễn thị');
 
@@ -304,7 +305,9 @@ const detectCrisis = (message) => has(CRISIS_RE, message);
 const DOSE_RE = words('mấy viên', 'bao nhiêu viên', 'liều(?: dùng| lượng)?', 'uống mấy lần', 'uống bao nhiêu(?! nước| lít)', 'mấy gói', 'bao nhiêu ml',
   'thuốc (?:\\p{L}+ ){0,4}(?:nào|gì) (?:tốt|hiệu quả|nhanh|hay)', '(?:mua|dùng|uống) thuốc (?:gì|nào)', 'thuốc (?:\\p{L}+ ){0,4}loại nào',
   'kê (?:đơn|thuốc)(?: \\p{L}+){0,2} (?:giúp|cho|hộ)', '(?:giúp|cho) (?:tôi|mình|em) (?:đơn )?thuốc',
-  'siro(?: \\p{L}+){0,2} (?:gì|nào)', 'uống (?:trước|sau)(?: hay (?:trước|sau))? (?:khi |bữa )?ăn', 'uống (?:lúc|khi) (?:nào|đói|no)', 'uống (?:chung|cùng) (?:với )?(?:thuốc|rượu|bia|sữa)');
+  'siro(?: \\p{L}+){0,2} (?:gì|nào)', 'uống (?:trước|sau)(?: hay (?:trước|sau))? (?:khi |bữa )?ăn', 'uống (?:lúc|khi) (?:nào|đói|no)', 'uống (?:chung|cùng) (?:với )?(?:thuốc|rượu|bia|sữa)',
+  'thuốc(?: \\p{L}+){0,3} (?:uống|dùng) (?:thế nào|như thế nào|ra sao)', 'cách (?:uống|dùng) thuốc', 'uống mấy ngày', 'uống (?:trong )?bao lâu',
+  'uống (?:thuốc )?(?:\\p{L}+ ){0,3}nhiều có (?:hại|sao|được)', 'thuốc (?:\\p{L}+ ){0,3}có hại (?:không|gì)');
 const detectDoseQuestion = (message) => has(DOSE_RE, message);
 const detectDoseTimingQuestion = (message) => /uống (?:trước|sau|lúc|khi|chung|cùng)/.test(String(message || '').toLowerCase());
 
@@ -314,7 +317,7 @@ const OWN_DATA_RE = /(?:đơn thuốc|hoá đơn|hóa đơn|hồ sơ|kết quả
 const OWN_DATA_KINDS = [
   ['followups', /tái khám/],
   ['invoices', /hoá đơn|hóa đơn|thanh toán|trả tiền|đóng tiền|lần trước[^.?!]{0,20}(?:bao nhiêu tiền|hết bao nhiêu)/],
-  ['records', /đơn thuốc|chẩn đoán|hồ sơ (?:khám|bệnh)|kết quả khám|bác sĩ (?:kê|dặn|nói)|thuốc (?:bác sĩ|lần trước)|đã khám (?:những |các )?(?:khoa|gì|ở)|lần (?:khám )?trước (?:tôi|mình|em) (?:bị|khám)|lần (?:khám )?trước[^.?!]{0,25}thuốc/],
+  ['records', /đơn thuốc|chẩn đoán|hồ sơ (?:khám|bệnh)|kết quả khám|bác sĩ (?:kê|dặn|nói)|thuốc (?:bác sĩ|lần trước)|đã khám (?:những |các )?(?:khoa|gì|ở)|lần (?:khám )?trước (?:tôi|mình|em) (?:bị|khám)|lần (?:khám )?trước[^.?!]{0,25}thuốc|khám (?:khoa \p{L}+(?: \p{L}+)? )?(?:lần nào|bao giờ|mấy lần)/u],
   ['appointments', /lịch (?:hẹn|khám)|đã đặt|lịch của (?:tôi|mình|em)|có lịch/],
 ];
 function detectOwnDataKind(message) {
@@ -344,6 +347,13 @@ const BOOKING_FAQ = [
   ['relative', /đặt (?:lịch |hẹn |khám )?(?:cho|hộ|giùm|giúp) (?:người nhà|bố|mẹ|ba|má|vợ|chồng|con|ông|bà|anh|chị|người khác|người thân)/],
   ['late', /(?:đến|tới) (?:muộn|trễ)|trễ hẹn|lỡ hẹn|không (?:đến|tới) (?:được|kịp)/],
   ['duration', /khám[^.?!]{0,15}(?:bao lâu|mấy tiếng|mấy phút)|(?:chờ|đợi)[^.?!]{0,10}(?:lâu không|bao lâu)/],
+  ['followupFee', /(?:khám lại|tái khám)[^.?!]{0,20}(?:mất|tốn|tính|có|thu) (?:tiền|phí)|(?:khám lại|tái khám)[^.?!]{0,20}(?:giảm|miễn phí|bao nhiêu)/],
+  ['account', /(?:đổi|quên|sửa|cập nhật|thay) (?:số điện thoại|sđt|email|tên|thông tin)(?: \p{L}+){0,3} (?:tài khoản|đăng ký|đăng nhập)|(?:quên|đổi) (?:số điện thoại|email) (?:đã )?đăng ký|(?:xoá|xóa|huỷ|hủy) tài khoản|tài khoản(?: \p{L}+){0,3} bị (?:khoá|khóa)|(?:không|chưa) nhận được (?:mã )?otp|mã otp/u],
+  ['howto', /(?:hướng dẫn|cách|làm sao để|làm thế nào để) (?:\p{L}+ ){0,2}đặt lịch|đặt lịch (?:online|trực tuyến|thế nào|như thế nào|ra sao)/u],
+  ['confirm', /(?:tin nhắn|sms|email|thông báo|gọi điện) xác nhận|bao lâu (?:thì )?(?:được |mới được )?xác nhận|khi nào (?:được |thì )?xác nhận|(?:được|đã) xác nhận chưa/],
+  ['byPhone', /đặt (?:lịch|hẹn|khám) (?:qua|bằng) (?:zalo|điện thoại|hotline|facebook|tin nhắn)|gọi điện (?:để )?đặt (?:lịch|hẹn)/],
+  ['guardian', /(?:bố mẹ|phụ huynh|người lớn|người giám hộ)(?: \p{L}+){0,2} (?:đi )?cùng|(?:dưới|chưa đủ) 18 tuổi|(?:1[0-7]) tuổi (?:tự|một mình) (?:đi )?khám/u],
+  ['results', /(?:xem|tra cứu|lấy|coi) (?:lại )?(?:kết quả|hồ sơ|đơn thuốc|chẩn đoán)(?: khám| xét nghiệm)?(?: ở đâu| thế nào| như thế nào| bằng cách nào)|(?:làm (?:thế nào|sao)|cách) (?:để )?(?:xem|lấy|tra cứu) (?:kết quả|hồ sơ|đơn thuốc)|kết quả (?:khám|xét nghiệm) (?:xem|lấy) ở đâu/],
 ];
 function detectBookingFaq(message) {
   const lower = String(message || '').toLowerCase();
@@ -412,11 +422,17 @@ const detectEnglish = (message) => {
 };
 
 // Hỏi giá: { list: true } | { discount: 'bhyt'|'sinh_vien'|null } | null. "rẻ" phải là nguyên từ (không khớp "trẻ em").
-const PRICE_RE = /giá|bao nhiêu tiền|hết bao nhiêu|trả bao nhiêu|còn bao nhiêu|chi phí|tốn bao nhiêu|đắt|(?<!\p{L})rẻ(?!\p{L})|phí khám|giảm (?:mấy|bao nhiêu)|được giảm|phần trăm/u;
+const PRICE_RE = /giá|bao nhiêu tiền|hết bao nhiêu|trả bao nhiêu|còn bao nhiêu|chi phí|tốn bao nhiêu|đắt|(?<!\p{L})rẻ(?!\p{L})|phí khám|giảm (?:mấy|bao nhiêu)|được giảm|phần trăm|khám miễn phí|(?:có )?miễn phí (?:không|ko|chứ)|^\s*khám (?:\p{L}+ ){1,3}bao nhiêu\s*[?]*$/u;
+// Nhóm khách hỏi giảm giá mà phòng khám chưa có mức riêng.
+const OTHER_GROUP_RE = /người (?:cao tuổi|già|lớn tuổi)|trẻ (?:em|nhỏ)(?: dưới \d+ tuổi)?|hộ nghèo|cận nghèo|thương binh|cựu chiến binh|người khuyết tật|người có công|nhân viên|giáo viên|bộ đội|công an/;
 function detectPriceQuestion(message) {
   const lower = String(message || '').toLowerCase();
   if (!PRICE_RE.test(lower) || /giá (?:vàng|xăng|dầu|đô|usd)/.test(lower) || /giá thuốc/.test(lower)) return null;
   if (/bảng giá|các (?:chuyên )?khoa|từng (?:chuyên )?khoa|đắt hơn|rẻ hơn|rẻ nhất|đắt nhất|so với/.test(lower)) return { list: true };
+  if (/(?:bhyt|bảo hiểm)[^.?!]{0,20}(?:hết hạn|quá hạn)|(?:hết hạn|quá hạn)[^.?!]{0,20}(?:bhyt|bảo hiểm)/.test(lower)) return { policy: true, discount: 'bhyt', expired: true };
+  const group = !/bhyt|bảo hiểm|sinh viên/.test(lower) && lower.match(OTHER_GROUP_RE);
+  if (group && /giảm|miễn phí|ưu đãi/.test(lower)) return { policy: true, discount: null, otherGroup: group[0] };
+  if (/miễn phí/.test(lower)) return { policy: true, discount: null, free: true };
   // Có cả 2 loại thẻ — giảm giá không cộng dồn.
   if (/bhyt|bảo hiểm/.test(lower) && /sinh viên/.test(lower)) return { policy: true, discount: null, both: true };
   const discount = /bhyt|bảo hiểm/.test(lower) ? 'bhyt' : /sinh viên/.test(lower) ? 'sinh_vien' : null;
@@ -428,14 +444,15 @@ function detectPriceQuestion(message) {
 // Hỏi tiện ích/liên hệ: 'address' | 'contact' | 'payment' | 'feedback' | 'unknown' (chưa có thông tin) | null.
 function detectFacilityInfo(message) {
   const lower = String(message || '').toLowerCase();
-  if (/chỉ đường|đường đi|bản đồ|google map|đến phòng khám (?:thế nào|bằng cách nào)|xe buýt|xe bus|taxi|grab/.test(lower)) return 'address';
+  if (/chỉ đường|đường đi|bản đồ|google map|đến phòng khám (?:thế nào|bằng cách nào)|xe buýt|xe bus|taxi|grab|(?:ở|nằm ở|trên) (?:đường|phố) nào|số nhà|gần (?:chợ|trường|bệnh viện|ngã|cây xăng|siêu thị)(?: \p{L}+){0,2} (?:nào|không)|(?:gần|cách|xa) trung tâm/u.test(lower)) return 'address';
   // Hỏi cách thanh toán (không phải "hoá đơn của tôi đã thanh toán chưa").
-  if (/quẹt thẻ|thẻ (?:tín dụng|ngân hàng|visa|atm)|chuyển khoản|tiền mặt|momo|ví điện tử|thanh toán (?:bằng|qua|thế nào|như thế nào|ra sao)|trả tiền (?:bằng|qua|thế nào)/.test(lower)
+  if (/quẹt thẻ|thẻ (?:tín dụng|ngân hàng|visa|atm)|chuyển khoản|tiền mặt|momo|ví điện tử|thanh toán (?:bằng|qua|thế nào|như thế nào|ra sao)|trả (?:tiền )?(?:bằng|qua) (?:gì|cách nào)|trả tiền (?:bằng|qua|thế nào)|trả bằng gì/.test(lower)
     && !/trả góp/.test(lower)) return 'payment';
   // "viết giùm email xin nghỉ ốm" là nhờ viết hộ, không phải hỏi email phòng khám.
   if (/zalo|fanpage|facebook|(?<!viết (?:\p{L}+ )?)email|e-mail|website|liên hệ|hotline|(?:số điện thoại|sđt|số máy)(?: của)? (?:phòng khám|pk|bên (?:mình|bạn))|gọi (?:vào )?số nào/u.test(lower)) return 'contact';
   if (/góp ý|khiếu nại|phản ánh|phàn nàn/.test(lower)) return 'feedback';
-  if (/gửi xe|đỗ xe|đậu xe|bãi (?:xe|đỗ)|ô tô|thang máy|khuyết tật|xe lăn|atm|trả góp|tuyển dụng|việc làm|hợp tác|căng tin|nhà vệ sinh|thành lập|hoạt động (?:từ|được) (?:năm|bao lâu)|mở (?:từ )?năm nào|có từ (?:năm|bao giờ|khi nào)|từ năm (?:nào|bao nhiêu)|ưu tiên|(?:khám|đến) (?:tại|tận) nhà|kinh nghiệm|bằng cấp|học ở đâu/.test(lower)) return 'unknown';
+  if (/kín đáo|riêng tư|bảo mật (?:thông tin|hồ sơ)|ai (?:được )?xem (?:được )?hồ sơ/.test(lower)) return 'privacy';
+  if (/gửi xe|đỗ xe|đậu xe|bãi (?:xe|đỗ)|ô tô|thang máy|khuyết tật|xe lăn|atm|trả góp|tuyển dụng|việc làm|hợp tác|căng tin|nhà vệ sinh|thành lập|hoạt động (?:từ|được) (?:năm|bao lâu)|mở (?:từ )?năm nào|có từ (?:năm|bao giờ|khi nào)|từ năm (?:nào|bao nhiêu)|ưu tiên|(?:khám|đến) (?:tại|tận) nhà|kinh nghiệm|bằng cấp|học ở đâu|phiên dịch|thông dịch|sổ (?:tiêm|tiêm chủng|khám)|xuất hoá đơn|xuất hóa đơn|hoá đơn (?:vat|đỏ)|hóa đơn (?:vat|đỏ)|24\/7|cả đêm/.test(lower)) return 'unknown';
   return null;
 }
 
@@ -445,10 +462,19 @@ const IDENTITY_RE = words(
   '(?:bạn|em|mày) do ai', '(?:bạn|em|mày) có phải (?:là )?(?:người|bác sĩ|robot|máy|ai|chatgpt)', '(?:bạn|em) tên (?:là )?gì',
   '(?:bạn|em) (?:có )?thông minh', '(?:bạn|em) (?:dùng|là) (?:chatgpt|gemini|gpt)',
   '(?:bạn|em) (?:có thể )?(?:giúp|hỗ trợ|làm) (?:được )?(?:gì|những gì)', '(?:ai|người nào) đang (?:trả lời|nói chuyện|chat)',
-  '(?:bot|chatbot) (?:này )?là (?:gì|ai)',
+  '(?:bot|chatbot) (?:này )?là (?:gì|ai)', '(?:bạn|em) (?:có thể )?(?:tư vấn|giúp|hỗ trợ)(?: (?:giúp|cho|hộ))?(?: (?:tôi|mình|em))? (?:được không|không)\\s*[?!.]*$',
   '(?:dùng|chạy|là)(?: bằng| trên)? (?:model|mô hình|ai|trí tuệ nhân tạo)(?: \\p{L}+)? (?:gì|nào)', 'model (?:gì|nào)'
 );
 const detectIdentityQuestion = (message) => has(IDENTITY_RE, message);
+
+// Muốn gặp người thật: 'human' (nhân viên) | 'doctor' (bác sĩ) | 'emergency' (hỏi phòng khám có cấp cứu không) | null.
+function detectContactRequest(message) {
+  const lower = String(message || '').toLowerCase();
+  if (/(?:khám|nhận|có) (?:\p{L}+ ){0,2}cấp cứu(?: \p{L}+){0,3} (?:không|được không)|(?:phòng khám|ở đây) (?:có )?cấp cứu/u.test(lower)) return 'emergency';
+  if (/người thật|tư vấn viên|nhân viên (?:tư vấn|thật|trực)|(?:nói chuyện|gặp|chat) (?:với |trực tiếp )?(?:nhân viên|người)/.test(lower)) return 'human';
+  if (/(?:cho (?:tôi|mình|em) )?(?:gặp|nói chuyện với|hỏi trực tiếp) (?:bác sĩ|bs)(?! \p{Lu})\s*[?!.]*$/u.test(lower)) return 'doctor';
+  return null;
+}
 
 // Hỏi đánh giá/giới thiệu cơ sở y tế khác. Không bắt "phòng khám ở đâu".
 const OTHER_FACILITY_RE = words(
@@ -458,7 +484,7 @@ const OTHER_FACILITY_RE = words(
 const detectOtherFacilityQuestion = (message) => has(OTHER_FACILITY_RE, message);
 
 // Hỏi giờ/ngày làm việc chung.
-const HOURS_RE = /(?:thứ (?:2|3|4|5|6|7|hai|ba|tư|năm|sáu|bảy)|chủ nhật|buổi trưa|trưa|buổi tối|tối|mấy giờ|\d{1,2}\s*(?:h|giờ)(?: \p{L}+)?)[^.?!]{0,25}(?:có )?(?:khám|làm việc|làm|mở cửa|nghỉ|đóng cửa)(?: không)?\s*[?!.]*$|giờ (?:làm việc|mở cửa|đóng cửa)/;
+const HOURS_RE = /(?:thứ (?:2|3|4|5|6|7|hai|ba|tư|năm|sáu|bảy)|chủ nhật|buổi trưa|trưa|buổi tối|tối|mấy giờ|\d{1,2}\s*(?:h|giờ)(?: \p{L}+)?)[^.?!]{0,25}(?:có )?(?:khám|làm việc|làm|mở cửa|nghỉ|đóng cửa)(?: không)?\s*[?!.]*$|giờ (?:làm việc|mở cửa|đóng cửa)|nghỉ trưa|(?:mấy|bao nhiêu) giờ (?:\p{L}+ ){0,2}(?:mở|đóng) cửa/u;
 const detectHoursQuestion = (message) => HOURS_RE.test(String(message || '').toLowerCase());
 
 // Hỏi lịch ngày lễ/Tết — phòng khám chưa công bố.
@@ -566,7 +592,7 @@ function detectSpecialtyScopeQuestion(message) {
 }
 
 // Hỏi triệu chứng có nguy hiểm/nặng không, hay có phải bệnh X không.
-const DANGER_RE = words('(?:có )?nguy hiểm (?:không|ko|chứ|lắm không)', 'có (?:nặng|nghiêm trọng|đáng lo) (?:không|ko|lắm không)', 'có bị (?:gì|làm sao) không', 'có phải (?:bệnh )?(?:nặng|ung thư) không',
+const DANGER_RE = words('(?:có )?nguy hiểm (?:không|ko|chứ|lắm không)', 'có (?:cần|nên) (?:phải )?(?:đi )?khám (?:không|ko|chưa|ngay không)', '(?:cần|nên) đi khám (?:không|ko|chưa)', 'có (?:nặng|nghiêm trọng|đáng lo) (?:không|ko|lắm không)', 'có bị (?:gì|làm sao) không', 'có phải (?:bệnh )?(?:nặng|ung thư) không',
   'có phải (?:là )?(?:(?:tôi|mình|em|bé|con(?: tôi)?) )?(?:bị |bệnh |dấu hiệu (?:của |bị )?)(?:\\p{L}+ ){1,4}(?:không|ko)',
   'có phải (?:là )?(?:sốt|ruột thừa|ung thư|sỏi|viêm|tiểu đường|đột quỵ|lao|zona|thuỷ đậu|thủy đậu|sởi|covid|cúm|sốt xuất huyết|trầm cảm|trĩ|u)(?: \\p{L}+){0,3} (?:không|ko)',
   '(?:nghĩ|nghi|sợ|lo|chắc) (?:là )?(?:mình|tôi|em) (?:bị|mắc)', 'hình như (?:mình|tôi|em) (?:bị|mắc)');
@@ -580,7 +606,7 @@ function detectSpecialtyFollowUp(message) {
   return null;
 }
 
-const EMERGENCY_RE = words('khó thở', 'đau ngực', 'tức ngực', 'bất tỉnh', 'ngất', 'co giật', 'chảy máu nhiều', 'nôn ra máu', 'ho ra máu',
+const EMERGENCY_RE = words('khó thở(?! khi (?:leo|đi|chạy|gắng sức|vận động|tập|làm))', 'đau ngực', 'tức ngực', 'bất tỉnh', 'ngất', 'co giật', 'chảy máu nhiều', 'nôn ra máu', 'ho ra máu',
   'đi ngoài ra máu', 'đi tiêu ra máu', 'đại tiện ra máu', 'đau bụng (?:quằn quại|dữ dội)', 'đau đầu dữ dội', 'đột quỵ', 'méo miệng', 'yếu nửa người', 'liệt', 'ngừng thở',
   'nghẹt thở', 'ngực (?:đau|tức)', 'đau thắt ngực', 'nói ngọng', 'nói khó', '(?:tay|chân) yếu', 'yếu (?:tay|chân)', 'tê nửa người',
   '(?:đập|va|chấn thương) đầu', 'ngã (?:\\p{L}+ ){0,2}không (?:đứng|dậy)', 'gãy (?:xương|tay|chân)', 'trật khớp',
@@ -590,9 +616,18 @@ const EMERGENCY_RE = words('khó thở', 'đau ngực', 'tức ngực', 'bất t
   'uống nhầm', 'quá liều', 'uống (?:hết |cả )?(?:\\d+|cả|hết|một) (?:\\p{L}+ )?(?:viên|vỉ|lọ|hộp)', 'sốc phản vệ', 'sốt (?:cao )?(?:40|41|42)(?:[.,]\\d)?(?: độ)?', 'dữ dội (?:và )?đột ngột', 'đột ngột (?:\\p{L}+ )?dữ dội', '(?:mang thai|có thai|bầu|thai)(?:[ ,.]+[\\p{L}\\d]+){0,4}[ ,.]+(?:ra máu|ra nước|đau bụng từng cơn|đau bụng dữ dội)');
 
 // Dấu hiệu có thể cấp cứu — trả về các từ khớp (mảng rỗng nếu không có).
+// Bỏ qua dấu hiệu bị phủ định: "không khó thở", "có co giật không? à không có".
 function detectEmergency(message) {
-  return [...new Set([...String(message || '').toLowerCase().matchAll(EMERGENCY_RE)].map((m) => m[0]))];
+  const lower = String(message || '').toLowerCase();
+  return [...new Set([...lower.matchAll(EMERGENCY_RE)]
+    .filter((m) => !/(?:không|chưa|chẳng)(?: (?:có|bị|thấy))?\s*$/.test(lower.slice(Math.max(0, m.index - 12), m.index))
+      && !/^\s*(?:không|ko)(?!\p{L})[^.]{0,8}(?:không|ko)(?!\p{L})/u.test(lower.slice(m.index + m[0].length)))
+    .map((m) => m[0]))];
 }
+
+// Hỏi bệnh có lây không — khả năng lây tuỳ nguyên nhân, không tự khẳng định có/không.
+const CONTAGION_RE = /(?<!\p{L})(?:có )?(?:bị )?lây(?: (?:sang|cho|qua|nhiễm cho)(?: \p{L}+){1,3})?(?: không| ko| chứ| được không| không ạ)\s*[?!.]*$|lây (?:qua|bằng) (?:đường )?(?:gì|nào)/u;
+const detectContagionQuestion = (message) => CONTAGION_RE.test(String(message || '').toLowerCase());
 
 // Vết thương nhẹ cần sơ cứu đúng cách chứ chưa tới mức gọi 115: 'bite' (chó/mèo cắn, cào) | 'burn' (bỏng nhẹ) | null.
 function detectFirstAid(message) {
@@ -607,7 +642,7 @@ const detectDayPeriod = (message) => (String(message || '').toLowerCase().match(
 
 const WEEKDAY_WORDS = { '2': 1, hai: 1, '3': 2, ba: 2, '4': 3, 'tư': 3, '5': 4, 'năm': 4, '6': 5, 'sáu': 5, '7': 6, 'bảy': 6 };
 // "có chỗ" không tính ("có chỗ gửi xe không"); "đánh trống ngực" là triệu chứng tim mạch.
-const SLOT_INTENT_RE = /(?<!đánh )trống|\d{1,2}\s*[/.-]\s*\d{1,2}[^.?!]{0,20}khám[^.?!]{0,15}được không|rảnh|còn (?:giờ|lịch|chỗ|slot)|có (?:lịch|giờ khám|ai khám)|còn khám (?:được )?không|giờ nào|khung giờ|lịch khám (?:nào|ngày|tuần|hôm|thứ|chủ nhật)|(?:check|kiểm tra|xem) lịch|lịch[^.?!]{0,30}(?:còn|có)[^.?!]{0,10}không|(?:mai|hôm nay|ngày mai|ngày kia|thứ \d|chủ nhật|(?:sáng|trưa|chiều|tối) nay)[^.?!]{0,20}khám[^.?!]{0,15}được không|^\s*(?:(?:sáng|trưa|chiều|tối|ngày|hôm)\s+)?(?:mai|nay|ngày kia|thứ\s*\d)\s*(?:lúc\s*)?\d{1,2}\s*(?:h|giờ)\s*(?:\d{2}|rưỡi)?\s*(?:sáng|chiều|tối)?\s*$|khám[^.?!]{0,20}(?:mai|hôm nay|ngày mai|ngày kia|thứ \d|chủ nhật)[^.?!]{0,10}được không|(?:mai|hôm nay|ngày kia|thứ \d|chủ nhật|\d{1,2}\s*(?:h|giờ))[^.?!]{0,25}còn (?:không|chỗ|được)/;
+const SLOT_INTENT_RE = /(?<!đánh )trống|\d{1,2}\s*[/.-]\s*\d{1,2}[^.?!]{0,20}khám[^.?!]{0,15}được không|rảnh|còn (?:giờ|lịch|chỗ|slot)|có (?:lịch|giờ khám|ai khám)|còn khám (?:được )?không|giờ nào|khung giờ|lịch khám (?:nào|ngày|tuần|hôm|thứ|chủ nhật)|(?:check|kiểm tra|xem) lịch|lịch[^.?!]{0,30}(?:còn|có)[^.?!]{0,10}không|(?:mai|hôm nay|ngày mai|ngày kia|thứ \d|chủ nhật|(?:sáng|trưa|chiều|tối) nay)[^.?!]{0,20}khám[^.?!]{0,15}được không|^\s*(?:(?:sáng|trưa|chiều|tối|ngày|hôm)\s+)?(?:mai|nay|ngày kia|thứ\s*\d)\s*(?:lúc\s*)?\d{1,2}\s*(?:h|giờ)\s*(?:\d{2}|rưỡi)?\s*(?:sáng|chiều|tối)?\s*$|khám[^.?!]{0,20}(?:mai|hôm nay|ngày mai|ngày kia|thứ \d|chủ nhật)[^.?!]{0,10}được không|(?:mai|hôm nay|ngày kia|thứ \d|chủ nhật|\d{1,2}\s*(?:h|giờ)|(?:sáng|trưa|chiều|tối) nay)[^.?!]{0,25}còn (?:không|chỗ|được|khám)|muốn khám ngay|khám ngay (?:bây giờ|hôm nay|được không)|bây giờ (?:còn )?(?:đến|khám) (?:được|kịp)/;
 // "Lịch của tôi", "tôi đã đặt"… là hỏi lịch hẹn của chính khách, không phải lịch trống.
 const OWN_APPOINTMENT_RE = /lịch(?: hẹn| khám)? của (?:tôi|mình|em)|(?:tôi|mình|em) (?:đã đặt|có lịch)/;
 
@@ -649,7 +684,7 @@ function detectSlotQuery(message, todayISO) {
       dates = [addDaysISO(todayISO, 2)];
     } else if (/(?:ngày|sáng|trưa|chiều|tối|hôm) mai|(?<!\p{L})mai(?!\p{L})/u.test(lower)) {
       dates = [addDaysISO(todayISO, 1)];
-    } else if (/hôm nay|(?:sáng|trưa|chiều|tối) nay/.test(lower)) {
+    } else if (/hôm nay|(?:sáng|trưa|chiều|tối) nay|bây giờ|khám ngay/.test(lower)) {
       dates = [todayISO];
     } else {
       dates = openDaysFrom(todayISO, addDaysISO(todayISO, 6)).slice(0, 3);
@@ -812,6 +847,8 @@ module.exports = {
   SPECIALTY_SCOPE,
   detectEmergency,
   detectFirstAid,
+  detectContagionQuestion,
+  detectContactRequest,
   detectSlotQuery,
   detectPrescriptionQuestion,
   isVagueComplaint,
