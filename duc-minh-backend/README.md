@@ -37,29 +37,27 @@ Mở http://localhost:4000 → thấy trang chủ. Bấm "Đăng nhập" → san
 
 > Mình đã sửa toàn bộ code sang PostgreSQL nhưng **chưa tự chạy thử được với CSDL thật** trong môi trường này (máy không có sẵn Postgres/Docker để test). Sau khi bạn có `DATABASE_URL` ở bước 1, hãy tự chạy `npm run dev` và thử đăng ký/đăng nhập/xem danh sách admin một lượt trước khi deploy công khai — nếu có lỗi gì cứ gửi lại mình sửa tiếp.
 
-## Bước 3 — Đưa code lên GitHub
+## Bước 3 — Code trên GitHub
 
-Máy bạn hiện **chưa cài Git** (mình thử cài giúp nhưng bị chặn vì cần quyền admin). Bạn cài Git theo 1 trong 2 cách:
-- Tải https://git-scm.com/download/win, cài đặt bình thường (Next → Next → Install), hoặc
-- Cài GitHub Desktop (https://desktop.github.com) — có giao diện, không cần dùng dòng lệnh.
+Toàn bộ thư mục `D:\AI` (code + báo cáo + tài liệu `_extracted`) được lưu ở **một repo duy nhất**:
+https://github.com/youngdragon26/my-new-project — gốc repo là `D:\AI`, code web nằm trong thư mục con
+`duc-minh-backend/` (giữ nguyên lịch sử commit cũ). Repo cũ `duc-minh-clinic` không dùng nữa.
 
-Sau khi có Git, tạo 1 repo mới trên GitHub (đặt tên ví dụ `duc-minh-clinic`), rồi ở thư mục `duc-minh-backend`:
+Lưu thay đổi mới (chạy ở `D:\AI`):
 
 ```
-git init
-git add .
-git commit -m "Website va tai khoan Da Khoa Duc Minh"
-git branch -M main
-git remote add origin https://github.com/<ten-github-cua-ban>/duc-minh-clinic.git
-git push -u origin main
+git add -A
+git commit -m "Mô tả thay đổi"
+git push
 ```
 
-(File `.env` đã được `.gitignore` — mật khẩu/secret của bạn sẽ không bị đẩy lên GitHub.)
+`.gitignore` ở gốc `D:\AI` loại trừ: `.env`, `data.db`, `node_modules/`, bộ cài `Git/`, `OllamaModels/`,
+`OllamaSetup.exe` và tài liệu có bản quyền (`Chuyên khoa/` — Cẩm nang MSD) vì repo đang Public.
 
 ## Bước 4 — Deploy lên Render (miễn phí, có link công khai)
 
 1. Vào https://render.com, đăng ký (dùng GitHub cho nhanh).
-2. **New +** → **Web Service** → chọn repo `duc-minh-clinic` vừa tạo. Render sẽ tự đọc file `render.yaml` mình đã chuẩn bị sẵn trong repo (build command, start command đã điền sẵn).
+2. **New +** → **Web Service** → chọn repo `my-new-project`, đặt **Root Directory** = `duc-minh-backend` (code không nằm ở gốc repo). Build/start command lấy theo file `duc-minh-backend/render.yaml`. Service đã tạo sẵn thì vào **Settings → Build & Deploy** để đổi repo và Root Directory.
 3. Điền 2 biến môi trường còn thiếu trong phần Environment:
    - `DATABASE_URL` = chuỗi kết nối Neon ở Bước 1.
    - `ADMIN_REGISTER_CODE` = một mã bí mật do nhóm tự đặt (ví dụ `DUCMINH-ADMIN-2026`, hoặc đổi thành mã khác chỉ Minh/Vũ biết).
