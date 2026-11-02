@@ -27,11 +27,26 @@ CSDL **PostgreSQL thật** (Neon, miễn phí) — không mất dữ liệu khi 
 
 ## Bước 2 — Chạy thử ở máy bạn
 
+Cần Node.js ≥ 18 (https://nodejs.org) và Git.
+
 ```
-cd duc-minh-backend
+git clone https://github.com/youngdragon26/my-new-project.git AI
+cd AI/duc-minh-backend
 npm install
+copy .env.example .env      (macOS/Linux: cp .env.example .env)
 npm run dev
 ```
+
+Trước khi `npm run dev`, mở `.env` và điền ít nhất `DATABASE_URL` (Bước 1); nên điền thêm `GEMINI_API_KEY` (Bước 6)
+để có chatbot. `.env` không có trên GitHub — nếu còn file `.env` cũ thì chép lại nguyên file đó.
+
+Dữ liệu (tài khoản, lịch hẹn, hoá đơn, cơ sở tri thức Cẩm nang MSD, câu trả lời mẫu) nằm trong CSDL Neon, **không**
+nằm trong git: dùng lại đúng `DATABASE_URL` cũ là có đủ dữ liệu. Chỉ khi tạo CSDL mới (trống) mới cần nạp lại:
+- `node scripts/seed-chat-examples.js` — câu trả lời mẫu cho chatbot.
+- `node scripts/seed-doctor-bios.js` — lý lịch bác sĩ mẫu (sau khi đã tạo tài khoản bác sĩ).
+- `node scripts/ingest-chuyen-khoa.js` — nạp PDF Cẩm nang MSD; script đọc thư mục `Chuyên khoa/` nằm cạnh
+  `duc-minh-backend/` (cùng cấp, trong `D:\AI`). Thư mục này không có trên GitHub (tài liệu bản quyền) nên phải
+  tự chép vào hoặc tải lại từ msdmanuals.com.
 
 Mở http://localhost:4000 → thấy trang chủ. Bấm "Đăng nhập" → sang `/tai-khoan.html` → thử đăng ký/đăng nhập.
 
