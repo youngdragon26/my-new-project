@@ -1,0 +1,17 @@
+# Phần mềm cài đặt / model lớn — không lưu lên git
+Git/
+OllamaModels/
+OllamaSetup.exe
+.claude/
+
+# Tài liệu bản quyền (Cẩm nang MSD, tài liệu khoá học) — repo đang Public
+Chuyên khoa/
+_extracted/Khac/phòng khám/
+_extracted/Khac/AIO2025_Tutorial_RAG.pdf
+
+# Bí mật, dữ liệu cục bộ, thư viện
+node_modules/
+.env
+data.db
+data.db-*
+*.log
